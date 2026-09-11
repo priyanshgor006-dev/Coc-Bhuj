@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin &mdash; Chamber of Commerce Bhuj</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+<style>
+
+:root {
+  --navy: #6b1f2a; --navy-dark: #4a1420; --navy-light: #8c3341;
+  --gold: #d97706; --gold-light: #f2a93c; --gold-hover: #b45309;
+  --bg: #ffffff; --bg-soft: #f8fafc; --text: #1f2937;
+  --muted: #6b7280; --border: #e5e7eb; --wine-tint: #f8f0f1;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; padding: 0; background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6; -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+button { font: inherit; cursor: pointer; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.gradient-text {
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 10px; font-size: 10.5px; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--navy-light);
+}
+.eyebrow::before { content: ""; height: 1px; width: 24px; background: var(--gold); flex-shrink: 0; }
+
+/* ===== Header ===== */
+.site-header {
+  background: rgba(255,255,255,.98); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50; transition: box-shadow .25s var(--ease);
+}
+.site-header.scrolled { box-shadow: 0 2px 14px rgba(0,0,0,.06); }
+.header-inner {
+  max-width: 1240px; margin: 0 auto; padding: 6px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px; position: relative;
+}
+.logo { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+.logo-mark { width: 84px; height: 84px; object-fit: contain; flex-shrink: 0; display: none; opacity: 0; transition: opacity .5s var(--ease); }
+.logo-mark.loaded { display: block; opacity: 1; }
+.logo-text { line-height: 1.2; font-size: 1.15rem; color: var(--navy-dark); }
+.logo-sub { display: block; font-size: 9px; font-weight: 500; color: var(--muted); letter-spacing: .16em; text-transform: uppercase; margin-top: 5px; }
+@media (max-width: 480px) {
+  .header-inner { padding: 6px 16px; }
+  .logo-mark { width: 56px; height: 56px; }
+  .logo-text { font-size: .95rem; }
+  .logo-sub { display: none; }
+}
+
+.nav-menu ul { display: flex; gap: 18px; list-style: none; margin: 0; padding: 0; }
+.nav-menu a {
+  position: relative; display: inline-block; padding: 16px 0; font-size: 12.5px; font-weight: 550;
+  color: #4e5157; white-space: nowrap; transition: color .2s var(--ease);
+}
+.nav-menu a::after {
+  content: ""; position: absolute; left: 0; bottom: 8px; width: 0; height: 2px;
+  border-radius: 1px; background: var(--gold); transition: width .25s var(--ease);
+}
+.nav-menu a:hover, .nav-menu a.active { color: var(--navy); }
+.nav-menu a:hover::after, .nav-menu a.active::after { width: 100%; }
+.nav-admin { color: var(--navy) !important; font-weight: 650; }
+
+.nav-toggle {
+  display: none; background: transparent; border: 1px solid var(--border); border-radius: 6px;
+  width: 42px; height: 42px; cursor: pointer; padding: 0; position: relative; flex-shrink: 0;
+}
+.nav-toggle span {
+  position: absolute; left: 11px; right: 11px; height: 2px; background: var(--navy);
+  border-radius: 2px; transition: transform .2s var(--ease), top .2s var(--ease), opacity .2s var(--ease);
+}
+.nav-toggle span:nth-child(1) { top: 13px; }
+.nav-toggle span:nth-child(2) { top: 20px; }
+.nav-toggle span:nth-child(3) { top: 27px; }
+.nav-toggle.open span:nth-child(1) { top: 20px; transform: rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { top: 20px; transform: rotate(-45deg); }
+@media (max-width: 1080px) {
+  .nav-toggle { display: block; }
+  .nav-menu {
+    display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff;
+    border-bottom: 1px solid var(--border); padding: 10px 20px 20px;
+    box-shadow: 0 12px 26px rgba(35,14,22,.09);
+  }
+  .nav-menu.open { display: block; }
+  .nav-menu ul { flex-direction: column; gap: 2px; }
+  .nav-menu a { display: block; padding: 13px 0; font-size: 14px; }
+  .nav-menu a::after { bottom: 7px; }
+}
+
+/* ===== Buttons ===== */
+.btn {
+  position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center;
+  gap: 10px; padding: 13px 24px; min-height: 46px; border-radius: 8px; font-size: 13.5px; font-weight: 650;
+  border: 1px solid transparent; transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease), border-color .25s var(--ease);
+  white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-hover) 100%); color: #fff;
+  box-shadow: 0 4px 14px rgba(217,119,6,.35);
+}
+.btn-primary::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,.28) 50%, transparent 75%);
+  transform: translateX(-120%); transition: transform .6s var(--ease); pointer-events: none;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(217,119,6,.43); }
+.btn-primary:hover::after { transform: translateX(120%); }
+.btn-outline { background: transparent; color: var(--navy); border-color: #d8bec3; }
+.btn-outline:hover { background: var(--wine-tint); border-color: var(--navy-light); transform: translateY(-2px); }
+.btn-outline-light { background: transparent; color: #fff; border-color: rgba(255,255,255,.4); }
+.btn-outline-light:hover { background: rgba(255,255,255,.12); border-color: #fff; transform: translateY(-2px); }
+.btn-small { min-height: 38px; padding: 9px 16px; font-size: 12px; }
+.btn:disabled { opacity: .6; cursor: not-allowed; transform: none !important; }
+
+/* ===== Cards ===== */
+.card {
+  background: #fff; border: 1px solid var(--border); border-radius: 13px;
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
+}
+.card:hover {
+  transform: translateY(-4px); box-shadow: 0 12px 32px rgba(107,31,42,.12), 0 2px 8px rgba(0,0,0,.04);
+  border-color: var(--navy-light);
+}
+.photo-wrap { position: relative; overflow: hidden; background: #efe8e9; }
+.photo-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
+.card:hover .photo-wrap img, a:hover .photo-wrap img, button:hover .photo-wrap img { transform: scale(1.05); }
+.image-fallback {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: #b99ba2; background: var(--wine-tint);
+}
+
+/* ===== Reveal animation ===== */
+.reveal {
+  opacity: 0; transform: translateX(-40px);
+  transition: opacity .7s var(--ease), transform .7s var(--ease);
+}
+.reveal.reveal-right { transform: translateX(40px); }
+.reveal.reveal-visible { opacity: 1; transform: translateX(0); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ===== Page header ===== */
+.page-hero {
+  position: relative; overflow: hidden; padding: 52px 0 54px;
+  background: radial-gradient(ellipse at 100% 0%, rgba(217,119,6,.07), transparent 48%),
+              radial-gradient(ellipse at 0% 100%, rgba(107,31,42,.06), transparent 55%), #fcf9f8;
+  border-bottom: 1px solid var(--border);
+}
+.page-hero h1 { font-size: clamp(1.8rem, 3.5vw, 2.4rem); font-weight: 700; margin: 0 0 10px; letter-spacing: -.02em; }
+.page-hero p { color: var(--muted); margin: 0; max-width: 600px; font-size: 15px; }
+
+/* ===== Section basics ===== */
+.section { padding: 72px 0; }
+.section-soft { background: var(--bg-soft); }
+.section-heading { text-align: center; margin-bottom: 38px; }
+.section-heading h2 { font-size: clamp(1.5rem, 2.6vw, 1.8rem); font-weight: 700; margin: 0 0 10px; }
+.section-heading p { color: var(--muted); margin: 0; max-width: 560px; margin-inline: auto; font-size: .98rem; }
+
+/* ===== Icons ===== */
+.icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; vertical-align: middle; }
+
+/* ===== States (loading / empty / error) ===== */
+.state-block { text-align: center; padding: 64px 20px; grid-column: 1 / -1; }
+.state-icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px;
+  color: var(--navy-light); background: var(--wine-tint); border-radius: 50%; margin-bottom: 20px;
+}
+.state-icon .icon { width: 28px; height: 28px; }
+.state-block h3 { font-size: 1.2rem; font-weight: 650; color: var(--navy); margin: 0 0 8px; }
+.state-block p { color: var(--muted); font-size: .92rem; max-width: 420px; margin: 0 auto; }
+.state-block .btn { margin-top: 20px; }
+.spinner {
+  width: 30px; height: 30px; border: 3px solid var(--border); border-top-color: var(--navy);
+  border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 14px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== Forms ===== */
+.admin-form { max-width: 640px; background: #fff; border: 1px solid var(--border); border-radius: 13px; padding: 26px; margin-bottom: 32px; }
+.admin-form h2 { margin: 0 0 18px; font-size: 1.15rem; color: var(--navy); font-weight: 700; }
+.form-row { margin-bottom: 15px; }
+.form-row label { display: block; font-size: .85rem; font-weight: 650; margin-bottom: 6px; color: var(--text); }
+.form-row .req { color: #a63842; margin-left: 2px; }
+.form-row input, .form-row select, .form-row textarea {
+  width: 100%; padding: 10px 13px; font-size: .93rem; font-family: inherit;
+  background: #fff; border: 1px solid var(--border); border-radius: 8px; outline: none; color: var(--text);
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+  border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(107,31,42,.08);
+}
+.form-row textarea { min-height: 90px; resize: vertical; }
+.form-status { padding: 10px 13px; border-radius: 8px; font-size: .88rem; margin-bottom: 12px; border: 1px solid transparent; display: none; }
+.form-status.visible { display: block; }
+.form-status.success { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.form-status.error { background: #fef2f2; color: #a63842; border-color: #fecaca; }
+
+/* ===== Footer ===== */
+.site-footer { background: var(--navy-dark); color: rgba(255,255,255,.85); padding: 34px 20px; text-align: center; font-size: .88rem; }
+.site-footer p { margin: 0; }
+.site-footer .footer-brand { font-weight: 650; color: #fff; margin-bottom: 4px; }
+.site-footer .contact { opacity: .7; margin-top: 10px; font-size: .82rem; }
+
+
+  .admin-wrap { max-width: 1200px; margin: 0 auto; padding: 28px 20px 60px; }
+  .tabs-bar { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 28px; overflow-x: auto; scrollbar-width: none; }
+  .tabs-bar::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    padding: 11px 18px; background: transparent; border: none; border-bottom: 2px solid transparent;
+    color: var(--muted); font-weight: 550; cursor: pointer; white-space: nowrap; font-family: inherit;
+    font-size: .92rem; margin-bottom: -1px; transition: color .15s var(--ease), border-color .15s var(--ease);
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--navy); border-bottom-color: var(--navy); font-weight: 650; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .list-header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .list-header h3 { font-size: 1.1rem; margin: 0; color: var(--navy); font-weight: 700; }
+  .list-header .count { font-size: .85rem; color: var(--muted); }
+  .item-list { display: flex; flex-direction: column; gap: 10px; }
+  .item-row {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  @media (min-width: 640px) { .item-row { flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; } }
+  .item-info { display: flex; align-items: flex-start; gap: 12px; min-width: 0; flex: 1; }
+  .item-thumb {
+    width: 52px; height: 52px; border-radius: 8px; background: var(--wine-tint); border: 1px solid var(--border);
+    overflow: hidden; display: flex; align-items: center; justify-content: center; color: var(--navy); flex-shrink: 0;
+  }
+  .item-thumb.round { border-radius: 50%; }
+  .item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .item-details { flex: 1; min-width: 0; }
+  .item-details h4 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--text); }
+  .item-sub { font-size: .85rem; color: var(--muted); margin-top: 2px; }
+  .item-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px; font-size: .8rem; color: var(--muted); }
+  .item-badge { display: inline-block; padding: 2px 9px; background: var(--wine-tint); color: var(--navy); border-radius: 999px; font-size: .7rem; font-weight: 650; text-transform: uppercase; }
+  .item-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .action-btn {
+    padding: 5px 10px; background: transparent; border: 1px solid var(--border); border-radius: 6px;
+    font-size: .75rem; font-weight: 650; cursor: pointer; font-family: inherit; transition: all .12s var(--ease);
+  }
+  .action-btn.add { color: var(--navy); } .action-btn.add:hover { background: var(--wine-tint); border-color: var(--navy); }
+  .action-btn.remove { color: var(--muted); } .action-btn.remove:hover { background: #fef2f2; color: #a63842; border-color: #fecaca; }
+  .action-btn.delete { color: #a63842; border-color: var(--border); } .action-btn.delete:hover { background: #fef2f2; border-color: #a63842; }
+
+  .upload-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .upload-preview { width: 64px; height: 64px; border-radius: 8px; background: var(--wine-tint); overflow: hidden; display: none; }
+  .upload-preview.visible { display: block; }
+  .upload-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .toggle { position: relative; display: inline-block; width: 42px; height: 23px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-slider { position: absolute; inset: 0; background: var(--border); border-radius: 24px; cursor: pointer; transition: background .2s var(--ease); }
+  .toggle-slider::before { content: ""; position: absolute; height: 17px; width: 17px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: transform .2s var(--ease); }
+  .toggle input:checked + .toggle-slider { background: var(--navy); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(19px); }
+
+</style>
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <img id="siteLogo" class="logo-mark" alt="Chamber of Commerce Bhuj" />
+      <span class="logo-text">Chamber of Commerce Bhuj<span class="logo-sub">Kutch &middot; Gujarat</span></span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navMenu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-menu" id="navMenu" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="news.html">News</a></li>
+        <li><a href="directory.html">Directory</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="certificates.html">Certificates</a></li>
+        <li><a href="committee.html">Committee</a></li>
+        <li><a href="membership.html">Membership</a></li>
+        <li><a href="admin.html" class="active" aria-current="page">Admin</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="container reveal">
+      <span class="eyebrow">Chamber of Commerce Bhuj</span>
+      <h1 class="gradient-text">Admin Panel</h1>
+      <p>Manage site content from a single dashboard.</p>
+    </div>
+  </section>
+
+  <div class="admin-wrap">
+    <div class="tabs-bar" role="tablist">
+      <button type="button" class="tab-btn active" data-tab="news">News</button>
+      <button type="button" class="tab-btn" data-tab="members">Members</button>
+      <button type="button" class="tab-btn" data-tab="gallery">Gallery</button>
+      <button type="button" class="tab-btn" data-tab="committee">Committee</button>
+      <button type="button" class="tab-btn" data-tab="projects">Projects</button>
+      <button type="button" class="tab-btn" data-tab="sitemedia">Site Media</button>
+    </div>
+
+    <!-- NEWS -->
+    <section class="tab-panel active" id="tab-news">
+      <div class="admin-form" style="max-width:640px">
+        <h2>News editor</h2>
+        <p style="color:var(--muted);font-size:.92rem;margin-bottom:20px">The news editor lives on its own dedicated page, where you can publish, edit and delete news posts.</p>
+        <a href="edit.html" class="btn btn-primary">Open News Editor</a>
+      </div>
+    </section>
+
+    <!-- MEMBERS -->
+    <section class="tab-panel" id="tab-members">
+      <form id="memberForm" class="admin-form" novalidate>
+        <h2>Add a new member</h2>
+        <div class="form-status" id="memberFormStatus"></div>
+        <div class="form-row"><label>Member name <span class="req">*</span></label><input id="f-member-name" required /></div>
+        <div class="form-row"><label>Company name <span class="req">*</span></label><input id="f-company-name" required /></div>
+        <div class="form-row"><label>Category</label>
+          <select id="f-category">
+            <option value="">Select category</option>
+            <option>Business &amp; Trade</option><option>Manufacturing</option><option>Retail</option>
+            <option>Services</option><option>Import &amp; Export</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-row"><label>Description</label><textarea id="f-description"></textarea></div>
+        <div class="form-row"><label>Phone</label><input id="f-phone" /></div>
+        <div class="form-row"><label>Email</label><input id="f-email" /></div>
+        <div class="form-row"><label>Address</label><textarea id="f-address"></textarea></div>
+        <button type="submit" class="btn btn-primary" id="memberSubmitBtn">Add member</button>
+      </form>
+      <div class="list-header"><h3>Current members</h3><span class="count" id="membersCount"></span></div>
+      <div id="membersList" class="item-list"><div class="state-block"><div class="spinner"></div>Loading members...</div></div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="tab-panel" id="tab-gallery">
+      <div class="admin-form" style="max-width:640px">
+        <h2>Add a new photo</h2>
+        <div class="form-status" id="galleryFormStatus"></div>
+        <div class="upload-row">
+          <button type="button" class="btn btn-outline btn-small" id="galleryUploadBtn">Upload photo</button>
+          <div class="upload-preview" id="galleryPreview"><img id="galleryPreviewImg" alt="" /></div>
+        </div>
+        <div class="form-row"><label>Caption</label><input id="galleryCaption" /></div>
+        <div class="form-row"><label>Event name</label><input id="galleryEventName" /></div>
+        <button type="button" class="btn btn-primary" id="gallerySaveBtn" disabled>Save</button>
+      </div>
+      <div class="list-header"><h3>Current photos</h3><span class="count" id="galleryCount"></span></div>
+      <div id="galleryGrid" class="item-list"><div class="state-block"><div class="spinner"></div>Loading photos...</div></div>
+    </section>
+
+    <!-- COMMITTEE -->
+    <section class="tab-panel" id="tab-committee">
+      <form id="committeeForm" class="admin-form" novalidate>
+        <h2>Add a committee member</h2>
+        <div class="form-status" id="committeeFormStatus"></div>
+        <div class="form-row"><label>Name <span class="req">*</span></label><input id="committeeName" required /></div>
+        <div class="form-row"><label>Designation <span class="req">*</span></label><input id="committeeDesignation" required placeholder="e.g. President" /></div>
+        <div class="form-row"><label>Company name</label><input id="committeeBusinessName" /></div>
+        <div class="form-row"><label>Phone</label><input id="committeePhone" /></div>
+        <div class="form-row"><label>Email</label><input id="committeeEmail" /></div>
+        <div class="form-row"><label>Sort order</label><input id="committeeSortOrder" type="number" /></div>
+        <div class="upload-row">
+          <button type="button" class="btn btn-outline btn-small" id="committeeUploadBtn">Upload photo</button>
+          <div class="upload-preview" id="committeePreview"><img id="committeePreviewImg" alt="" /></div>
+        </div>
+        <button type="button" class="btn btn-primary" id="committeeSaveBtn">Add member</button>
+      </form>
+      <div class="list-header"><h3>Current members</h3><span class="count" id="committeeCount"></span></div>
+      <div id="committeeList" class="item-list"><div class="state-block"><div class="spinner"></div>Loading committee...</div></div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="tab-panel" id="tab-projects">
+      <form id="projectForm" class="admin-form" novalidate>
+        <h2>Add a new project</h2>
+        <div class="form-status" id="projectFormStatus"></div>
+        <div class="form-row"><label>Title <span class="req">*</span></label><input id="projectTitle" required /></div>
+        <div class="form-row"><label>Description</label><textarea id="projectDescription"></textarea></div>
+        <div class="form-row"><label>Status</label>
+          <select id="projectStatus"><option selected>Upcoming</option><option>In Progress</option><option>Completed</option></select>
+        </div>
+        <div class="form-row"><label>Start date</label><input id="projectStartDate" type="date" /></div>
+        <div class="form-row"><label>Target date</label><input id="projectTargetDate" type="date" /></div>
+        <div class="upload-row">
+          <button type="button" class="btn btn-outline btn-small" id="projectUploadBtn">Upload image</button>
+          <div class="upload-preview" id="projectPreview"><img id="projectPreviewImg" alt="" /></div>
+        </div>
+        <button type="button" class="btn btn-primary" id="projectSaveBtn">Save project</button>
+      </form>
+      <div class="list-header"><h3>Current projects</h3><span class="count" id="projectsCount"></span></div>
+      <div id="projectsList"><div class="state-block"><div class="spinner"></div>Loading projects...</div></div>
+    </section>
+
+    <!-- SITE MEDIA -->
+    <section class="tab-panel" id="tab-sitemedia">
+      <form id="mediaForm" class="admin-form" novalidate>
+        <h2>Add site media</h2>
+        <div class="form-status" id="mediaFormStatus"></div>
+        <div class="form-row"><label>Type</label>
+          <select id="mediaType"><option value="logo">Logo</option><option value="hero">Hero Carousel Photo</option></select>
+        </div>
+        <div class="upload-row">
+          <button type="button" class="btn btn-outline btn-small" id="mediaUploadBtn">Upload image</button>
+          <div class="upload-preview" id="mediaPreview"><img id="mediaPreviewImg" alt="" /></div>
+        </div>
+        <div class="form-row"><label>Caption</label><input id="mediaCaption" /></div>
+        <div class="form-row"><label>Sort order</label><input id="mediaSortOrder" type="number" /></div>
+        <button type="button" class="btn btn-primary" id="mediaSaveBtn">Add media</button>
+      </form>
+      <div class="list-header"><h3>Logo</h3><span class="count" id="mediaLogoCount"></span></div>
+      <div id="mediaLogoList" class="item-list" style="margin-bottom:32px"><div class="state-block"><div class="spinner"></div>Loading...</div></div>
+      <div class="list-header"><h3>Hero Carousel Photos</h3><span class="count" id="mediaHeroCount"></span></div>
+      <div id="mediaHeroList" class="item-list"><div class="state-block"><div class="spinner"></div>Loading...</div></div>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="footer-brand">Chamber of Commerce Bhuj</p>
+    <p>&copy; Chamber of Commerce Bhuj. All rights reserved.</p>
+    <p class="contact">contact@cocbhuj.org &middot; +91 2832 XXX XXX</p>
+  </div>
+</footer>
+
+<script>
+/* ---------- Nav toggle + header scroll shadow ---------- */
+  (function () {
+    var toggle = document.getElementById("navToggle");
+    var menu = document.getElementById("navMenu");
+    toggle.addEventListener("click", function () {
+      var open = menu.classList.toggle("open");
+      toggle.classList.toggle("open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    menu.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", function () {
+        menu.classList.remove("open");
+        toggle.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      });
+    });
+    var header = document.getElementById("siteHeader");
+    function updateShadow() { header.classList.toggle("scrolled", window.scrollY > 4); }
+    window.addEventListener("scroll", updateShadow, { passive: true });
+    updateShadow();
+  })();
+
+/* ---------- Tab switching ---------- */
+  (function () {
+    var tabButtons = document.querySelectorAll(".tab-btn");
+    var panels = document.querySelectorAll(".tab-panel");
+    tabButtons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        tabButtons.forEach(function (b) { b.classList.remove("active"); });
+        panels.forEach(function (p) { p.classList.remove("active"); });
+        btn.classList.add("active");
+        document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+      });
+    });
+  })();
+
+  /* ---------- Members tab ---------- */
+  (function () {
+    var supabaseClient = supabase.createClient("https://rvpiliwyqjowegmjcanr.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2cGlsaXd5cWpvd2VnbWpjYW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMDM2MjksImV4cCI6MjEwMjg3OTYyOX0.9ZQj69FLcFgqp8huYTqlWy4JGl-vYGmYZiiVUBo4Sio");
+    var allMembers = [];
+    var logoUpdateWidget = null;
+    var pendingLogoUpdateForMember = null;
+
+    var form = document.getElementById("memberForm");
+    var formStatus = document.getElementById("memberFormStatus");
+    var submitBtn = document.getElementById("memberSubmitBtn");
+    var membersList = document.getElementById("membersList");
+    var membersCount = document.getElementById("membersCount");
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+      });
+    }
+
+    function showStatus(el, type, message) {
+      el.className = "form-status visible " + type;
+      el.textContent = message;
+      if (type === "success") setTimeout(function () { el.classList.remove("visible"); }, 3500);
+    }
+    function setSubmitting(isSubmitting) {
+      submitBtn.disabled = isSubmitting;
+      submitBtn.textContent = isSubmitting ? "Adding..." : "Add member";
+    }
+
+    async function loadMembers() {
+      membersList.innerHTML = '<div class="state-block"><div class="spinner"></div>Loading members...</div>';
+      membersCount.textContent = "";
+      try {
+        var result = await supabaseClient.from("directory_members").select("*").order("contact_person_name", { ascending: true, nullsFirst: false });
+        if (result.error) throw result.error;
+        allMembers = result.data || [];
+        renderMembers();
+      } catch (err) {
+        console.error(err);
+        membersList.innerHTML = '<div class="state-block" style="color:#a63842">Couldn\'t load members. ' + escapeHtml(err.message || "") + '</div>';
+      }
+    }
+
+    function logoFallbackSVG() {
+      return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+    }
+
+    function renderMembers() {
+      membersList.innerHTML = "";
+      if (allMembers.length === 0) {
+        membersCount.textContent = "0 members";
+        membersList.innerHTML = '<div class="state-block">No members yet.</div>';
+        return;
+      }
+      membersCount.textContent = allMembers.length + (allMembers.length === 1 ? " member" : " members");
+      allMembers.forEach(function (m) { membersList.appendChild(createMemberRow(m)); });
+    }
+
+    function createMemberRow(m) {
+      var row = document.createElement("div");
+      row.className = "item-row";
+      var info = document.createElement("div");
+      info.className = "item-info";
+      var logo = document.createElement("div");
+      logo.className = "item-thumb";
+      if (m.logo_url) {
+        var img = document.createElement("img");
+        img.src = m.logo_url; img.alt = ""; img.loading = "lazy";
+        img.onerror = function () { logo.innerHTML = logoFallbackSVG(); };
+        logo.appendChild(img);
+      } else logo.innerHTML = logoFallbackSVG();
+      info.appendChild(logo);
+      var details = document.createElement("div");
+      details.className = "item-details";
+      var heading = document.createElement("h4");
+      heading.textContent = m.contact_person_name || "(unnamed)";
+      details.appendChild(heading);
+      if (m.business_name) {
+        var company = document.createElement("div");
+        company.className = "item-sub";
+        company.textContent = m.business_name;
+        details.appendChild(company);
+      }
+      var meta = document.createElement("div");
+      meta.className = "item-meta";
+      if (m.category) { var cat = document.createElement("span"); cat.className = "item-badge"; cat.textContent = m.category; meta.appendChild(cat); }
+      if (m.phone) { var ph = document.createElement("span"); ph.textContent = m.phone; meta.appendChild(ph); }
+      if (m.email) { var em = document.createElement("span"); em.textContent = m.email; meta.appendChild(em); }
+      if (meta.children.length > 0) details.appendChild(meta);
+      info.appendChild(details);
+      row.appendChild(info);
+      var actions = document.createElement("div");
+      actions.className = "item-actions";
+      var photoBtn = document.createElement("button");
+      photoBtn.type = "button";
+      if (m.logo_url) {
+        photoBtn.className = "action-btn remove"; photoBtn.textContent = "Remove photo";
+        photoBtn.addEventListener("click", function () { removeMemberPhoto(m); });
+      } else {
+        photoBtn.className = "action-btn add"; photoBtn.textContent = "Add photo";
+        photoBtn.addEventListener("click", function () { addMemberPhoto(m); });
+      }
+      actions.appendChild(photoBtn);
+      var del = document.createElement("button");
+      del.type = "button"; del.className = "action-btn delete"; del.textContent = "Delete";
+      del.addEventListener("click", function () { deleteMember(m); });
+      actions.appendChild(del);
+      row.appendChild(actions);
+      return row;
+    }
+
+    async function deleteMember(m) {
+      var displayName = m.contact_person_name || m.business_name || "this member";
+      if (!confirm("Delete " + displayName + "? This cannot be undone.")) return;
+      try {
+        var result = await supabaseClient.from("directory_members").delete().eq("id", m.id);
+        if (result.error) throw result.error;
+        await loadMembers();
+      } catch (err) { console.error(err); showStatus(formStatus, "error", "Couldn't delete member: " + (err.message || "Unknown error")); }
+    }
+
+    function initLogoWidget() {
+      if (typeof cloudinary === "undefined" || !cloudinary.createUploadWidget) return;
+      logoUpdateWidget = cloudinary.createUploadWidget({
+        cloudName: "c3josacx",
+        uploadPreset: "coc_bhuj_news",
+        folder: "coc-bhuj-news",
+        cropping: true,
+        multiple: false,
+        maxFiles: 1,
+        clientAllowedFormats: ["png", "jpg", "jpeg", "gif", "webp", "heic", "heif"]
+      }, async function (error, result) {
+        if (error) { showStatus(formStatus, "error", "Upload failed: " + (error.message || "Unknown error")); pendingLogoUpdateForMember = null; return; }
+        if (result && result.event === "success" && result.info && result.info.secure_url) {
+          if (pendingLogoUpdateForMember) {
+            var member = pendingLogoUpdateForMember;
+            pendingLogoUpdateForMember = null;
+            try {
+              var updateResult = await supabaseClient.from("directory_members").update({ logo_url: result.info.secure_url }).eq("id", member.id);
+              if (updateResult.error) throw updateResult.error;
+              showStatus(formStatus, "success", (member.contact_person_name || "Member") + "'s photo added.");
+              await loadMembers();
+            } catch (err) { console.error(err); showStatus(formStatus, "error", "Couldn't save photo: " + (err.message || "Unknown error")); }
+          }
+        }
+        if (result && result.event === "close") pendingLogoUpdateForMember = null;
+      });
+    }
+    function addMemberPhoto(member) {
+      if (!logoUpdateWidget) { showStatus(formStatus, "error", "Upload widget not ready. Please refresh."); return; }
+      pendingLogoUpdateForMember = member;
+      logoUpdateWidget.open();
+    }
+    async function removeMemberPhoto(member) {
+      var name = member.contact_person_name || member.business_name || "this member";
+      if (!confirm("Remove " + name + "'s photo?")) return;
+      try {
+        var updateResult = await supabaseClient.from("directory_members").update({ logo_url: null }).eq("id", member.id);
+        if (updateResult.error) throw updateResult.error;
+        showStatus(formStatus, "success", name + "'s photo removed.");
+        await loadMembers();
+      } catch (err) { console.error(err); showStatus(formStatus, "error", "Couldn't remove photo: " + (err.message || "Unknown error")); }
+    }
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var contactPersonName = document.getElementById("f-member-name").value.trim();
+      var businessName = document.getElementById("f-company-name").value.trim();
+      if (!contactPersonName || !businessName) { showStatus(formStatus, "error", "Member name and company name are required."); return; }
+      setSubmitting(true);
+      var row = {
+        contact_person_name: contactPersonName, business_name: businessName,
+        category: document.getElementById("f-category").value || null,
+        description: document.getElementById("f-description").value.trim() || null,
+        phone: document.getElementById("f-phone").value.trim() || null,
+        email: document.getElementById("f-email").value.trim() || null,
+        address: document.getElementById("f-address").value.trim() || null
+      };
+      try {
+        var result = await supabaseClient.from("directory_members").insert([row]);
+        if (result.error) throw result.error;
+        form.reset();
+        showStatus(formStatus, "success", "Member added successfully.");
+        await loadMembers();
+      } catch (err) { console.error(err); showStatus(formStatus, "error", "Couldn't add member: " + (err.message || "Unknown error")); }
+      finally { setSubmitting(false); }
+    });
+
+    initLogoWidget();
+    loadMembers();
+  })();
+
+  /* ---------- Gallery tab ---------- */
+  (function () {
+    var supabaseClient = supabase.createClient("https://rvpiliwyqjowegmjcanr.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2cGlsaXd5cWpvd2VnbWpjYW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMDM2MjksImV4cCI6MjEwMjg3OTYyOX0.9ZQj69FLcFgqp8huYTqlWy4JGl-vYGmYZiiVUBo4Sio");
+    var allPhotos = [], uploadedImageUrl = null, uploadWidget = null;
+    var formStatus = document.getElementById("galleryFormStatus");
+    var uploadBtn = document.getElementById("galleryUploadBtn");
+    var saveBtn = document.getElementById("gallerySaveBtn");
+    var previewBox = document.getElementById("galleryPreview");
+    var previewImg = document.getElementById("galleryPreviewImg");
+    var captionInput = document.getElementById("galleryCaption");
+    var eventInput = document.getElementById("galleryEventName");
+    var photosGrid = document.getElementById("galleryGrid");
+    var photosCount = document.getElementById("galleryCount");
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+      });
+    }
+    function showStatus(type, message) {
+      formStatus.className = "form-status visible " + type; formStatus.textContent = message;
+      if (type === "success") setTimeout(function () { formStatus.classList.remove("visible"); }, 3500);
+    }
+
+    function initWidget() {
+      if (typeof cloudinary === "undefined" || !cloudinary.createUploadWidget) { showStatus("error", "Upload widget didn't load. Refresh the page."); return; }
+      uploadWidget = cloudinary.createUploadWidget({
+        cloudName: "c3josacx",
+        uploadPreset: "coc_bhuj_news",
+        folder: "coc-bhuj-news",
+        cropping: true,
+        multiple: false,
+        maxFiles: 1,
+        clientAllowedFormats: ["png", "jpg", "jpeg", "gif", "webp", "heic", "heif"]
+      }, function (error, result) {
+        if (error) { showStatus("error", "Upload failed: " + (error.message || "Unknown error")); return; }
+        if (result && result.event === "success" && result.info && result.info.secure_url) {
+          uploadedImageUrl = result.info.secure_url;
+          previewImg.src = uploadedImageUrl;
+          previewBox.classList.add("visible");
+          saveBtn.disabled = false;
+        }
+      });
+    }
+    uploadBtn.addEventListener("click", function () {
+      if (uploadWidget) uploadWidget.open(); else showStatus("error", "Upload widget not ready.");
+    });
+
+    async function loadPhotos() {
+      photosGrid.innerHTML = '<div class="state-block"><div class="spinner"></div>Loading photos...</div>';
+      photosCount.textContent = "";
+      try {
+        var result = await supabaseClient.from("gallery_images").select("*").order("created_at", { ascending: false });
+        if (result.error) throw result.error;
+        allPhotos = result.data || [];
+        renderPhotos();
+      } catch (err) { console.error(err); photosGrid.innerHTML = '<div class="state-block" style="color:#a63842">Couldn\'t load photos.</div>'; }
+    }
+    function renderPhotos() {
+      photosGrid.innerHTML = "";
+      if (allPhotos.length === 0) { photosCount.textContent = "0 photos"; photosGrid.innerHTML = '<div class="state-block">No photos yet.</div>'; return; }
+      photosCount.textContent = allPhotos.length + (allPhotos.length === 1 ? " photo" : " photos");
+      allPhotos.forEach(function (p) { photosGrid.appendChild(createPhotoRow(p)); });
+    }
+    function createPhotoRow(photo) {
+      var row = document.createElement("div");
+      row.className = "item-row";
+      var info = document.createElement("div");
+      info.className = "item-info";
+      var thumb = document.createElement("div");
+      thumb.className = "item-thumb";
+      var img = document.createElement("img");
+      img.src = photo.image_url; img.alt = photo.caption || ""; img.loading = "lazy";
+      thumb.appendChild(img);
+      info.appendChild(thumb);
+      var details = document.createElement("div");
+      details.className = "item-details";
+      var h4 = document.createElement("h4");
+      h4.textContent = photo.caption || "(no caption)";
+      details.appendChild(h4);
+      if (photo.event_name) { var ev = document.createElement("div"); ev.className = "item-sub"; ev.textContent = photo.event_name; details.appendChild(ev); }
+      info.appendChild(details);
+      row.appendChild(info);
+      var actions = document.createElement("div");
+      actions.className = "item-actions";
+      var del = document.createElement("button");
+      del.type = "button"; del.className = "action-btn delete"; del.textContent = "Delete";
+      del.addEventListener("click", function () { deletePhoto(photo); });
+      actions.appendChild(del);
+      row.appendChild(actions);
+      return row;
+    }
+    async function deletePhoto(photo) {
+      var label = photo.caption || photo.event_name || "this photo";
+      if (!confirm("Delete " + label + "? This cannot be undone.")) return;
+      try {
+        var result = await supabaseClient.from("gallery_images").delete().eq("id", photo.id);
+        if (result.error) throw result.error;
+        await loadPhotos();
+      } catch (err) { console.error(err); showStatus("error", "Couldn't delete photo."); }
+    }
+    async function handleSave() {
+      if (!uploadedImageUrl) { showStatus("error", "Please upload an image first."); return; }
+      saveBtn.disabled = true; saveBtn.textContent = "Saving...";
+      var row = { image_url: uploadedImageUrl, caption: captionInput.value.trim() || null, event_name: eventInput.value.trim() || null };
+      try {
+        var result = await supabaseClient.from("gallery_images").insert([row]);
+        if (result.error) throw result.error;
+        captionInput.value = ""; eventInput.value = ""; uploadedImageUrl = null;
+        previewImg.removeAttribute("src"); previewBox.classList.remove("visible");
+        showStatus("success", "Photo added successfully.");
+        await loadPhotos();
+      } catch (err) { console.error(err); showStatus("error", "Couldn't save photo."); }
+      finally { saveBtn.disabled = false; saveBtn.textContent = "Save"; }
+    }
+    saveBtn.addEventListener("click", handleSave);
+    initWidget();
+    loadPhotos();
+  })();
+
+  /* ---------- Committee tab ---------- */
+  (function () {
+    var supabaseClient = supabase.createClient("https://rvpiliwyqjowegmjcanr.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2cGlsaXd5cWpvd2VnbWpjYW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMDM2MjksImV4cCI6MjEwMjg3OTYyOX0.9ZQj69FLcFgqp8huYTqlWy4JGl-vYGmYZiiVUBo4Sio");
+    var allMembers = [], uploadedImageUrl = null, photoWidget = null, pendingPhotoUpdateForMember = null;
+    var formStatus = document.getElementById("committeeFormStatus");
+    var uploadBtn = document.getElementById("committeeUploadBtn");
+    var previewBox = document.getElementById("committeePreview");
+    var previewImg = document.getElementById("committeePreviewImg");
+    var nameInput = document.getElementById("committeeName");
+    var designationInput = document.getElementById("committeeDesignation");
+    var businessInput = document.getElementById("committeeBusinessName");
+    var phoneInput = document.getElementById("committeePhone");
+    var emailInput = document.getElementById("committeeEmail");
+    var sortInput = document.getElementById("committeeSortOrder");
+    var saveBtn = document.getElementById("committeeSaveBtn");
+    var membersList = document.getElementById("committeeList");
+    var membersCount = document.getElementById("committeeCount");
+
+    function showStatus(type, message) {
+      formStatus.className = "form-status visible " + type; formStatus.textContent = message;
+      if (type === "success") setTimeout(function () { formStatus.classList.remove("visible"); }, 3500);
+    }
+    function getInitials(name) {
+      if (!name) return "?";
+      var parts = String(name).trim().split(/\s+/);
+      if (!parts[0]) return "?";
+      var first = parts[0].charAt(0), last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : "";
+      return (first + last).toUpperCase();
+    }
+
+    function initPhotoWidget() {
+      if (typeof cloudinary === "undefined" || !cloudinary.createUploadWidget) return;
+      photoWidget = cloudinary.createUploadWidget({
+        cloudName: "c3josacx",
+        uploadPreset: "coc_bhuj_news",
+        folder: "coc-bhuj-news",
+        cropping: true,
+        multiple: false,
+        maxFiles: 1,
+        clientAllowedFormats: ["png", "jpg", "jpeg", "gif", "webp", "heic", "heif"]
+      }, function (error, result) {
+        if (error) { showStatus("error", "Upload failed: " + (error.message || "Unknown error")); pendingPhotoUpdateForMember = null; return; }
+        if (result && result.event === "success" && result.info && result.info.secure_url) {
+          if (pendingPhotoUpdateForMember) {
+            var member = pendingPhotoUpdateForMember; pendingPhotoUpdateForMember = null;
+            updateMemberPhoto(member, result.info.secure_url);
+          } else {
+            uploadedImageUrl = result.info.secure_url;
+            previewImg.src = uploadedImageUrl;
+            previewBox.classList.add("visible");
+          }
+        }
+        if (result && result.event === "close") pendingPhotoUpdateForMember = null;
+      });
+    }
+    uploadBtn.addEventListener("click", function () {
+      if (photoWidget) { pendingPhotoUpdateForMember = null; photoWidget.open(); }
+      else showStatus("error", "Upload widget not ready.");
+    });
+    async function updateMemberPhoto(member, newPhotoUrl) {
+      try {
+        var result = await supabaseClient.from("committee_members").update({ photo_url: newPhotoUrl }).eq("id", member.id);
+        if (result.error) throw result.error;
+        showStatus("success", "Photo added for " + (member.name || "member") + ".");
+        await loadMembers();
+      } catch (err) { console.error(err); showStatus("error", "Couldn't save photo."); }
+    }
+    function addMemberPhoto(member) {
+      if (!photoWidget) { showStatus("error", "Upload widget not ready."); return; }
+      pendingPhotoUpdateForMember = member;
+      photoWidget.open();
+    }
+    async function removeMemberPhoto(member) {
+      var name = member.name || "this member";
+      if (!confirm("Remove " + name + "'s photo?")) return;
+      try {
+        var result = await supabaseClient.from("committee_members").update({ photo_url: null }).eq("id", member.id);
+        if (result.error) throw result.error;
+        showStatus("success", name + "'s photo removed.");
+        await loadMembers();
+      } catch (err) { console.error(err); showStatus("error", "Couldn't remove photo."); }
+    }
+    async function deleteMember(member) {
+      var name = member.name || "this member";
+      if (!confirm("Delete " + name + "? This cannot be undone.")) return;
+      try {
+        var result = await supabaseClient.from("committee_members").delete().eq("id", member.id);
+        if (result.error) throw result.error;
+        await loadMembers();
+      } catch (err) { console.error(err); showStatus("error", "Couldn't delete member."); }
+    }
+    async function loadMembers() {
+      membersList.innerHTML = '<div class="state-block"><div class="spinner"></div>Loading committee...</div>';
+      membersCount.textContent = "";
+      try {
+        var result = await supabaseClient.from("committee_members").select("*").order("sort_order", { ascending: true, nullsFirst: false });
+        if (result.error) throw result.error;
+        allMembers = result.data || [];
+        renderMembers();
+        updateDefaultSortOrder();
+      } catch (err) { console.error(err); membersList.innerHTML = '<div class="state-block" style="color:#a63842">Couldn\'t load committee.</div>'; }
+    }
+    function updateDefaultSortOrder() {
+      var maxSort = 0;
+      allMembers.forEach(function (m) { if (typeof m.sort_order === "number" && m.sort_order > maxSort) maxSort = m.sort_order; });
+      sortInput.value = maxSort + 1;
+    }
+    function renderMembers() {
+      membersList.innerHTML = "";
+      if (allMembers.length === 0) { membersCount.textContent = "0 members"; membersList.innerHTML = '<div class="state-block">No committee members yet.</div>'; return; }
+      membersCount.textContent = allMembers.length + (allMembers.length === 1 ? " member" : " members");
+      allMembers.forEach(function (m) { membersList.appendChild(createMemberRow(m)); });
+    }
+    function createMemberRow(m) {
+      var row = document.createElement("div");
+      row.className = "item-row";
+      var info = document.createElement("div");
+      info.className = "item-info";
+      var avatar = document.createElement("div");
+      avatar.className = "item-thumb round";
+      if (m.photo_url) {
+        var img = document.createElement("img");
+        img.src = m.photo_url; img.alt = m.name || ""; img.loading = "lazy";
+        img.onerror = function () { avatar.textContent = getInitials(m.name); };
+        avatar.appendChild(img);
+      } else avatar.textContent = getInitials(m.name);
+      info.appendChild(avatar);
+      var details = document.createElement("div");
+      details.className = "item-details";
+      var h4 = document.createElement("h4");
+      h4.textContent = m.name || "(unnamed)";
+      details.appendChild(h4);
+      if (m.designation) { var d = document.createElement("span"); d.className = "item-badge"; d.style.marginTop = "4px"; d.style.display = "inline-block"; d.textContent = m.designation; details.appendChild(d); }
+      if (m.business_name) { var c = document.createElement("div"); c.className = "item-sub"; c.textContent = m.business_name; details.appendChild(c); }
+      info.appendChild(details);
+      row.appendChild(info);
+      var actions = document.createElement("div");
+      actions.className = "item-actions";
+      var photoBtn = document.createElement("button");
+      photoBtn.type = "button";
+      if (m.photo_url) { photoBtn.className = "action-btn remove"; photoBtn.textContent = "Remove photo"; photoBtn.addEventListener("click", function () { removeMemberPhoto(m); }); }
+      else { photoBtn.className = "action-btn add"; photoBtn.textContent = "Add photo"; photoBtn.addEventListener("click", function () { addMemberPhoto(m); }); }
+      actions.appendChild(photoBtn);
+      var del = document.createElement("button");
+      del.type = "button"; del.className = "action-btn delete"; del.textContent = "Delete";
+      del.addEventListener("click", function () { deleteMember(m); });
+      actions.appendChild(del);
+      row.appendChild(actions);
+      return row;
+    }
+    saveBtn.addEventListener("click", async function () {
+      var name = nameInput.value.trim(), designation = designationInput.value.trim();
+      if (!name || !designation) { showStatus("error", "Name and designation are required."); return; }
+      saveBtn.disabled = true; saveBtn.textContent = "Adding...";
+      var row = {
+        name: name, designation: designation,
+        business_name: businessInput.value.trim() || null,
+        phone: phoneInput.value.trim() || null,
+        email: emailInput.value.trim() || null,
+        sort_order: sortInput.value !== "" ? Number(sortInput.value) : null,
+        photo_url: uploadedImageUrl || null
+      };
+      try {
+        var result = await supabaseClient.from("committee_members").insert([row]);
+        if (result.error) throw result.error;
+        nameInput.value = ""; designationInput.value = ""; businessInput.value = "";
+        phoneInput.value = ""; emailInput.value = ""; uploadedImageUrl = null;
+        previewImg.removeAttribute("src"); previewBox.classList.remove("visible");
+        showStatus("success", "Committee member added successfully.");
+        await loadMembers();
+      } catch (err) { console.error(err); showStatus("error", "Couldn't add member."); }
+      finally { saveBtn.disabled = false; saveBtn.textContent = "Add member"; }
+    });
+    initPhotoWidget();
+    loadMembers();
+  })();
+
+  /* ---------- Projects tab ---------- */
+  (function () {
+    var supabaseClient = supabase.createClient("https://rvpiliwyqjowegmjcanr.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2cGlsaXd5cWpvd2VnbWpjYW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMDM2MjksImV4cCI6MjEwMjg3OTYyOX0.9ZQj69FLcFgqp8huYTqlWy4JGl-vYGmYZiiVUBo4Sio");
+    var STATUS_ORDER = ["In Progress", "Upcoming", "Completed"];
+    var allProjects = [], uploadedImageUrl = null, uploadWidget = null;
+    var formStatus = document.getElementById("projectFormStatus");
+    var uploadBtn = document.getElementById("projectUploadBtn");
+    var previewBox = document.getElementById("projectPreview");
+    var previewImg = document.getElementById("projectPreviewImg");
+    var titleInput = document.getElementById("projectTitle");
+    var descInput = document.getElementById("projectDescription");
+    var statusInput = document.getElementById("projectStatus");
+    var startInput = document.getElementById("projectStartDate");
+    var targetInput = document.getElementById("projectTargetDate");
+    var saveBtn = document.getElementById("projectSaveBtn");
+    var projectsList = document.getElementById("projectsList");
+    var projectsCount = document.getElementById("projectsCount");
+
+    function showStatus(type, message) {
+      formStatus.className = "form-status visible " + type; formStatus.textContent = message;
+      if (type === "success") setTimeout(function () { formStatus.classList.remove("visible"); }, 3500);
+    }
+    function initWidget() {
+      if (typeof cloudinary === "undefined" || !cloudinary.createUploadWidget) return;
+      uploadWidget = cloudinary.createUploadWidget({
+        cloudName: "c3josacx",
+        uploadPreset: "coc_bhuj_news",
+        folder: "coc-bhuj-news",
+        cropping: true,
+        multiple: false,
+        maxFiles: 1,
+        clientAllowedFormats: ["png", "jpg", "jpeg", "gif", "webp", "heic", "heif"]
+      }, function (error, result) {
+        if (error) { showStatus("error", "Upload failed: " + (error.message || "Unknown error")); return; }
+        if (result && result.event === "success" && result.info && result.info.secure_url) {
+          uploadedImageUrl = result.info.secure_url;
+          previewImg.src = uploadedImageUrl;
+          previewBox.classList.add("visible");
+        }
+      });
+    }
+    uploadBtn.addEventListener("click", function () {
+      if (uploadWidget) uploadWidget.open(); else showStatus("error", "Upload widget not ready.");
+    });
+    async function loadProjects() {
+      projectsList.innerHTML = '<div class="state-block"><div class="spinner"></div>Loading projects...</div>';
+      projectsCount.textContent = "";
+      try {
+        var result = await supabaseClient.from("projects").select("*");
+        if (result.error) throw result.error;
+        allProjects = result.data || [];
+        renderProjects();
+      } catch (err) { console.error(err); projectsList.innerHTML = '<div class="state-block" style="color:#a63842">Couldn\'t load projects.</div>'; }
+    }
+    function statusClass(s) {
+      if (s === "In Progress") return "in-progress"; if (s === "Upcoming") return "upcoming"; if (s === "Completed") return "completed";
+      return "upcoming";
+    }
+    function renderProjects() {
+      projectsList.innerHTML = "";
+      if (allProjects.length === 0) { projectsCount.textContent = "0 projects"; projectsList.innerHTML = '<div class="state-block">No projects yet.</div>'; return; }
+      projectsCount.textContent = allProjects.length + (allProjects.length === 1 ? " project" : " projects");
+      var groups = {};
+      STATUS_ORDER.forEach(function (s) { groups[s] = []; });
+      allProjects.forEach(function (p) { var status = p.status || "Upcoming"; if (!groups[status]) groups[status] = []; groups[status].push(p); });
+      STATUS_ORDER.forEach(function (status) {
+        if (groups[status].length === 0) return;
+        var heading = document.createElement("div");
+        heading.className = "list-header";
+        heading.style.marginTop = "24px";
+        heading.innerHTML = "<h3>" + status + "</h3><span class='count'>(" + groups[status].length + ")</span>";
+        projectsList.appendChild(heading);
+        var list = document.createElement("div");
+        list.className = "item-list";
+        groups[status].forEach(function (p) { list.appendChild(createProjectRow(p)); });
+        projectsList.appendChild(list);
+      });
+    }
+    function createProjectRow(project) {
+      var row = document.createElement("div");
+      row.className = "item-row";
+      var info = document.createElement("div");
+      info.className = "item-info";
+      var thumb = document.createElement("div");
+      thumb.className = "item-thumb";
+      if (project.image_url) {
+        var img = document.createElement("img");
+        img.src = project.image_url; img.alt = project.title || ""; img.loading = "lazy";
+        thumb.appendChild(img);
+      }
+      info.appendChild(thumb);
+      var details = document.createElement("div");
+      details.className = "item-details";
+      var h4 = document.createElement("h4");
+      h4.textContent = project.title || "(untitled)";
+      details.appendChild(h4);
+      var badge = document.createElement("span");
+      badge.className = "item-badge";
+      badge.style.marginTop = "4px"; badge.style.display = "inline-block";
+      badge.textContent = project.status || "Upcoming";
+      details.appendChild(badge);
+      info.appendChild(details);
+      row.appendChild(info);
+      var actions = document.createElement("div");
+      actions.className = "item-actions";
+      var del = document.createElement("button");
+      del.type = "button"; del.className = "action-btn delete"; del.textContent = "Delete";
+      del.addEventListener("click", function () { deleteProject(project); });
+      actions.appendChild(del);
+      row.appendChild(actions);
+      return row;
+    }
+    async function deleteProject(project) {
+      var name = project.title || "this project";
+      if (!confirm('Delete "' + name + '"? This cannot be undone.')) return;
+      try {
+        var result = await supabaseClient.from("projects").delete().eq("id", project.id);
+        if (result.error) throw result.error;
+        await loadProjects();
+      } catch (err) { console.error(err); showStatus("error", "Couldn't delete project."); }
+    }
+    saveBtn.addEventListener("click", async function () {
+      var title = titleInput.value.trim();
+      if (!title) { showStatus("error", "Title is required."); titleInput.focus(); return; }
+      saveBtn.disabled = true; saveBtn.textContent = "Saving...";
+      var row = {
+        title: title, description: descInput.value.trim() || null, status: statusInput.value || "Upcoming",
+        start_date: startInput.value.trim() || null, target_date: targetInput.value.trim() || null,
+        image_url: uploadedImageUrl || null
+      };
+      try {
+        var result = await supabaseClient.from("projects").insert([row]);
+        if (result.error) throw result.error;
+        titleInput.value = ""; descInput.value = ""; statusInput.value = "Upcoming";
+        startInput.value = ""; targetInput.value = ""; uploadedImageUrl = null;
+        previewImg.removeAttribute("src"); previewBox.classList.remove("visible");
+        showStatus("success", "Project added successfully.");
+        await loadProjects();
+      } catch (err) { console.error(err); showStatus("error", "Couldn't save project."); }
+      finally { saveBtn.disabled = false; saveBtn.textContent = "Save project"; }
+    });
+    initWidget();
+    loadProjects();
+  })();
+
+  /* ---------- Site Media tab ---------- */
+  (function () {
+    var supabaseClient = supabase.createClient("https://rvpiliwyqjowegmjcanr.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2cGlsaXd5cWpvd2VnbWpjYW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMDM2MjksImV4cCI6MjEwMjg3OTYyOX0.9ZQj69FLcFgqp8huYTqlWy4JGl-vYGmYZiiVUBo4Sio");
+    var uploadedImageUrl = null, mediaWidget = null, allMedia = [];
+    var formStatus = document.getElementById("mediaFormStatus");
+    var uploadBtn = document.getElementById("mediaUploadBtn");
+    var previewBox = document.getElementById("mediaPreview");
+    var previewImg = document.getElementById("mediaPreviewImg");
+    var typeInput = document.getElementById("mediaType");
+    var captionInput = document.getElementById("mediaCaption");
+    var sortInput = document.getElementById("mediaSortOrder");
+    var saveBtn = document.getElementById("mediaSaveBtn");
+    var logoList = document.getElementById("mediaLogoList");
+    var heroList = document.getElementById("mediaHeroList");
+    var logoCount = document.getElementById("mediaLogoCount");
+    var heroCount = document.getElementById("mediaHeroCount");
+
+    function showStatus(type, message) {
+      formStatus.className = "form-status visible " + type; formStatus.textContent = message;
+      if (type === "success") setTimeout(function () { formStatus.classList.remove("visible"); }, 3500);
+    }
+    function initWidget() {
+      if (typeof cloudinary === "undefined" || !cloudinary.createUploadWidget) return;
+      // cropping disabled: logo/hero images should already be pre-cropped before upload
+      mediaWidget = cloudinary.createUploadWidget({
+        cloudName: "c3josacx",
+        uploadPreset: "coc_bhuj_news",
+        folder: "coc-bhuj-news",
+        cropping: false,
+        multiple: false,
+        maxFiles: 1,
+        clientAllowedFormats: ["png", "jpg", "jpeg", "gif", "webp", "heic", "heif"]
+      }, function (error, result) {
+        if (error) { showStatus("error", "Upload failed: " + (error.message || "Unknown error")); return; }
+        if (result && result.event === "success" && result.info && result.info.secure_url) {
+          uploadedImageUrl = result.info.secure_url;
+          previewImg.src = uploadedImageUrl;
+          previewBox.classList.add("visible");
+        }
+      });
+    }
+    uploadBtn.addEventListener("click", function () {
+      if (mediaWidget) mediaWidget.open(); else showStatus("error", "Upload widget not ready.");
+    });
+    function updateDefaultSortOrder() {
+      var type = typeInput.value;
+      var ofType = allMedia.filter(function (m) { return m.type === type; });
+      var maxSort = 0;
+      ofType.forEach(function (m) { if (typeof m.sort_order === "number" && m.sort_order > maxSort) maxSort = m.sort_order; });
+      sortInput.value = maxSort + 1;
+    }
+    typeInput.addEventListener("change", updateDefaultSortOrder);
+    async function loadMedia() {
+      logoList.innerHTML = '<div class="state-block"><div class="spinner"></div>Loading...</div>';
+      heroList.innerHTML = '<div class="state-block"><div class="spinner"></div>Loading...</div>';
+      logoCount.textContent = ""; heroCount.textContent = "";
+      try {
+        var result = await supabaseClient.from("site_media").select("*");
+        if (result.error) throw result.error;
+        allMedia = result.data || [];
+        renderMedia();
+        updateDefaultSortOrder();
+      } catch (err) {
+        console.error(err);
+        var msg = '<div class="state-block" style="color:#a63842">Couldn\'t load media.</div>';
+        logoList.innerHTML = msg; heroList.innerHTML = msg;
+      }
+    }
+    function renderMedia() {
+      var logos = allMedia.filter(function (m) { return m.type === "logo"; });
+      var heroes = allMedia.filter(function (m) { return m.type === "hero"; }).sort(function (a, b) {
+        return (a.sort_order || 0) - (b.sort_order || 0);
+      });
+      logoCount.textContent = logos.length + (logos.length === 1 ? " item" : " items");
+      heroCount.textContent = heroes.length + (heroes.length === 1 ? " photo" : " photos");
+      renderList(logoList, logos, false);
+      renderList(heroList, heroes, true);
+    }
+    function renderList(container, items, showCaption) {
+      container.innerHTML = "";
+      if (items.length === 0) { container.innerHTML = '<div class="state-block">No items yet.</div>'; return; }
+      items.forEach(function (m) { container.appendChild(createMediaRow(m, showCaption)); });
+    }
+    function createMediaRow(m, showCaption) {
+      var row = document.createElement("div");
+      row.className = "item-row";
+      var info = document.createElement("div");
+      info.className = "item-info";
+      var thumb = document.createElement("div");
+      thumb.className = "item-thumb";
+      if (m.image_url) {
+        var img = document.createElement("img");
+        img.src = m.image_url; img.alt = m.caption || ""; img.loading = "lazy";
+        thumb.appendChild(img);
+      }
+      info.appendChild(thumb);
+      var details = document.createElement("div");
+      details.className = "item-details";
+      if (showCaption) { var h4 = document.createElement("h4"); h4.textContent = m.caption || "(no caption)"; details.appendChild(h4); }
+      var meta = document.createElement("div");
+      meta.className = "item-sub";
+      meta.textContent = "Sort order: " + (typeof m.sort_order === "number" ? m.sort_order : "—");
+      details.appendChild(meta);
+      info.appendChild(details);
+      row.appendChild(info);
+      var actions = document.createElement("div");
+      actions.className = "item-actions";
+      actions.style.display = "flex"; actions.style.alignItems = "center"; actions.style.gap = "10px";
+      var toggleLabel = document.createElement("label");
+      toggleLabel.className = "toggle";
+      toggleLabel.title = m.active ? "Active" : "Inactive";
+      var checkbox = document.createElement("input");
+      checkbox.type = "checkbox"; checkbox.checked = !!m.active;
+      checkbox.addEventListener("change", function () {
+        supabaseClient.from("site_media").update({ active: checkbox.checked }).eq("id", m.id).then(function (r) {
+          if (r.error) { console.error(r.error); checkbox.checked = !checkbox.checked; showStatus("error", "Couldn't update status."); }
+          else m.active = checkbox.checked;
+        });
+      });
+      var slider = document.createElement("span");
+      slider.className = "toggle-slider";
+      toggleLabel.appendChild(checkbox); toggleLabel.appendChild(slider);
+      actions.appendChild(toggleLabel);
+      var del = document.createElement("button");
+      del.type = "button"; del.className = "action-btn delete"; del.textContent = "Delete";
+      del.addEventListener("click", function () { deleteMedia(m); });
+      actions.appendChild(del);
+      row.appendChild(actions);
+      return row;
+    }
+    async function deleteMedia(m) {
+      var label = m.caption || (m.type === "logo" ? "logo" : "hero photo");
+      if (!confirm("Delete " + label + "? This cannot be undone.")) return;
+      try {
+        var result = await supabaseClient.from("site_media").delete().eq("id", m.id);
+        if (result.error) throw result.error;
+        await loadMedia();
+      } catch (err) { console.error(err); showStatus("error", "Couldn't delete."); }
+    }
+    saveBtn.addEventListener("click", async function () {
+      if (!uploadedImageUrl) { showStatus("error", "Please upload an image first."); return; }
+      var type = typeInput.value;
+      saveBtn.disabled = true; saveBtn.textContent = "Adding...";
+      var row = {
+        type: type, image_url: uploadedImageUrl, caption: captionInput.value.trim() || null,
+        sort_order: sortInput.value !== "" ? Number(sortInput.value) : null, active: false
+      };
+      try {
+        var result = await supabaseClient.from("site_media").insert([row]);
+        if (result.error) throw result.error;
+        uploadedImageUrl = null; previewImg.removeAttribute("src"); previewBox.classList.remove("visible");
+        captionInput.value = "";
+        showStatus("success", "Media added successfully.");
+        await loadMedia();
+      } catch (err) { console.error(err); showStatus("error", "Couldn't save media."); }
+      finally { saveBtn.disabled = false; saveBtn.textContent = "Add media"; }
+    });
+    initWidget();
+    loadMedia();
+  })();
+
+/* ---------- Scroll reveal animations ---------- */
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var slideCounter = 0;
+    function assignDirection(el) {
+      if (!el.dataset.slideAssigned) {
+        if (slideCounter % 2 === 1) el.classList.add('reveal-right');
+        el.dataset.slideAssigned = "true";
+        slideCounter++;
+      }
+    }
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) entry.target.classList.add('reveal-visible');
+        else entry.target.classList.remove('reveal-visible');
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      assignDirection(el); observer.observe(el);
+    });
+    window.__observeReveal = function (el) {
+      if (el) { assignDirection(el); observer.observe(el); }
+    };
+  })();
+
+/* ---------- Site logo (from site_media) ---------- */
+  (function () {
+    if (typeof supabase === "undefined") return;
+    var supabaseClient = supabase.createClient("https://rvpiliwyqjowegmjcanr.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2cGlsaXd5cWpvd2VnbWpjYW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMDM2MjksImV4cCI6MjEwMjg3OTYyOX0.9ZQj69FLcFgqp8huYTqlWy4JGl-vYGmYZiiVUBo4Sio");
+    var logoImg = document.getElementById("siteLogo");
+    if (!logoImg) return;
+    supabaseClient
+      .from("site_media")
+      .select("image_url")
+      .eq("type", "logo")
+      .eq("active", true)
+      .order("sort_order", { ascending: true })
+      .limit(1)
+      .then(function (result) {
+        if (result.error) { console.error("Couldn't load site logo:", result.error.message); return; }
+        var rows = result.data || [];
+        if (rows.length > 0 && rows[0].image_url) {
+          logoImg.onload = function () { logoImg.classList.add("loaded"); };
+          logoImg.onerror = function () { console.warn("Site logo failed to load"); };
+          logoImg.src = rows[0].image_url;
+        }
+      })
+      .catch(function (err) { console.error("Logo fetch error:", err); });
+  })();
+</script>
+
+</body>
+</html>

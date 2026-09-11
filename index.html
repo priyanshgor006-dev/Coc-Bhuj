@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chamber of Commerce Bhuj</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --navy: #1e3a8a;
+    --navy-dark: #172554;
+    --navy-light: #3b5bbd;
+    --gold: #d97706;
+    --gold-soft: #fef3c7;
+    --bg: #ffffff;
+    --bg-soft: #f8fafc;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--navy); }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+  /* ===== Header ===== */
+  .site-header {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 6px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: relative;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+  }
+  .logo-mark {
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+    flex-shrink: 0;
+    display: none;
+  }
+  .logo-mark.loaded {
+    display: block;
+  }
+  .logo-text {
+    line-height: 1.2;
+    font-size: 1.2rem;
+  }
+  .logo-sub {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  @media (max-width: 480px) {
+    .header-inner { padding: 6px 16px; }
+    .logo-mark {
+      width: 56px;
+      height: 56px;
+    }
+    .logo-text { font-size: 1rem; }
+    .logo-sub { display: none; }
+  }
+
+  /* ===== Nav ===== */
+  .nav-menu ul {
+    display: flex;
+    gap: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-menu a {
+    display: block;
+    padding: 8px 13px;
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .nav-menu a:hover { background: var(--bg-soft); color: var(--navy); }
+  .nav-menu a.active,
+  .nav-menu a[aria-current="page"] {
+    background: var(--navy);
+    color: #fff;
+  }
+
+  /* ===== Hamburger ===== */
+  .nav-toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .nav-toggle span {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    height: 2px;
+    background: var(--navy);
+    border-radius: 2px;
+    transition: transform 0.2s ease, top 0.2s ease, opacity 0.2s ease;
+  }
+  .nav-toggle span:nth-child(1) { top: 12px; }
+  .nav-toggle span:nth-child(2) { top: 19px; }
+  .nav-toggle span:nth-child(3) { top: 26px; }
+  .nav-toggle.open span:nth-child(1) { top: 19px; transform: rotate(45deg); }
+  .nav-toggle.open span:nth-child(2) { opacity: 0; }
+  .nav-toggle.open span:nth-child(3) { top: 19px; transform: rotate(-45deg); }
+
+  @media (max-width: 960px) {
+    .nav-toggle { display: block; }
+    .nav-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px 16px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+    .nav-menu.open { display: block; }
+    .nav-menu ul { flex-direction: column; gap: 2px; }
+    .nav-menu a { padding: 11px 14px; border-radius: 6px; }
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 55%, #312e81 100%);
+    color: #fff;
+    padding: 80px 20px 40px;
+    position: relative;
+    overflow: hidden;
+    min-height: 600px;
+  }
+  .hero-slides {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .hero-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+  }
+  .hero-slide.active {
+    opacity: 1;
+  }
+  .hero.hero--no-photos::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 18% 25%, rgba(217, 119, 6, 0.18) 0%, transparent 42%),
+      radial-gradient(circle at 82% 75%, rgba(255, 255, 255, 0.08) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .hero-inner {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    max-width: 420px;
+    background: rgba(30, 58, 138, 0.92);
+    border-radius: 12px;
+    padding: 20px 24px;
+    text-align: left;
+    z-index: 4;
+  }
+  .hero-dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    gap: 8px;
+  }
+  .hero-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+  }
+  .hero-dot:hover {
+    background: rgba(255,255,255,0.7);
+  }
+  .hero-dot.active {
+    background: #fff;
+    width: 24px;
+    border-radius: 4px;
+  }
+  .hero.hero--no-photos .hero-slides,
+  .hero.hero--no-photos .hero-dots {
+    display: none;
+  }
+  @media (max-width: 640px) {
+    .hero {
+      min-height: 500px;
+      padding: 60px 16px 16px;
+    }
+    .hero-inner {
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      max-width: none;
+      padding: 24px 20px;
+    }
+    .trust-stats {
+      gap: 16px;
+    }
+    .trust-stat-number {
+      font-size: clamp(1.3rem, 6vw, 1.7rem);
+    }
+    .trust-stat-label {
+      font-size: 0.62rem;
+    }
+  }
+  .hero-inner h1 {
+    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+    margin: 0 0 8px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    color: #fff;
+  }
+  .hero-inner .tagline {
+    font-size: 0.95rem;
+    opacity: 0.92;
+    margin: 0;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  .hero-actions-section {
+    background: #fff;
+    padding: 16px 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-eyebrow-wrapper {
+    margin-bottom: 16px;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--navy);
+    border: 1px solid var(--navy);
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .trust-stats {
+    display: flex;
+    justify-content: center;
+    gap: 56px;
+    margin-bottom: 16px;
+  }
+  .trust-stat {
+    text-align: center;
+  }
+  .trust-stat-number {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .trust-stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+  .hero-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #b45309; transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+  .btn-ghost:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.6); }
+  .btn-ghost-light {
+    background: transparent;
+    color: var(--navy);
+    border-color: var(--navy);
+  }
+  .btn-ghost-light:hover {
+    background: var(--bg-soft);
+    border-color: var(--navy-dark);
+  }
+
+  /* ===== Quick links ===== */
+  .quick-links {
+    padding: 72px 20px;
+    background: var(--bg-soft);
+  }
+  .section-heading {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .section-heading h2 {
+    font-size: 1.6rem;
+    margin: 0 0 8px;
+    color: var(--navy);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .section-heading p {
+    color: var(--muted);
+    margin: 0;
+    font-size: 0.98rem;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  @media (min-width: 640px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) { .cards { grid-template-columns: repeat(4, 1fr); } }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px 22px 26px;
+    text-decoration: none;
+    color: var(--text);
+    border: 1px solid var(--border);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    display: block;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    border-color: var(--navy-light);
+  }
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--navy);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .card h3 {
+    font-size: 1.05rem;
+    margin: 0 0 6px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .card p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.55;
+  }
+  .card .card-link {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  /* ===== Footer ===== */
+  .site-footer {
+    background: var(--navy-dark);
+    color: rgba(255, 255, 255, 0.85);
+    padding: 32px 20px;
+    text-align: center;
+    font-size: 0.88rem;
+  }
+  .site-footer p { margin: 0; }
+  .site-footer .footer-brand { font-weight: 600; color: #fff; margin-bottom: 4px; }
+  .site-footer .contact { opacity: 0.7; margin-top: 10px; font-size: 0.82rem; }
+  .site-footer a { color: rgba(255, 255, 255, 0.9); text-decoration: none; }
+  .site-footer a:hover { text-decoration: underline; }
+
+  /* ===== Scroll reveal animations ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+        <img id="siteLogo" class="logo-mark" alt="Chamber of Commerce Bhuj" />
+      <span class="logo-text">
+        Chamber of Commerce Bhuj
+        <span class="logo-sub">Kutch · Gujarat</span>
+      </span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navMenu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-menu" id="navMenu" aria-label="Primary">
+      <ul>
+        <li><a href="index.html" class="active" aria-current="page">Home</a></li>
+        <li><a href="news.html">News</a></li>
+        <li><a href="directory.html">Directory</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="certificates.html">Certificates</a></li>
+        <li><a href="committee.html">Committee</a></li>
+        <li><a href="membership.html">Membership</a></li>
+        <li><a href="admin.html">Admin</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero hero--no-photos" id="hero">
+    <div class="hero-slides" id="heroSlides"></div>
+    <div class="hero-inner">
+      <h1>Chamber of Commerce Bhuj</h1>
+      <p class="tagline">Advancing trade, industry &amp; enterprise across Kutch</p>
+    </div>
+    <div class="hero-dots" id="heroDots"></div>
+  </section>
+
+  <section class="hero-actions-section">
+    <div class="container">
+      <div class="hero-eyebrow-wrapper">
+        <span class="hero-eyebrow">Established in service of trade</span>
+      </div>
+      <!-- PLACEHOLDER STATS: replace with real Chamber figures before final deploy -->
+      <div class="trust-stats">
+        <div class="trust-stat reveal">
+          <div class="trust-stat-number" data-target="500">0+</div>
+          <div class="trust-stat-label">Members</div>
+        </div>
+        <div class="trust-stat reveal">
+          <div class="trust-stat-number" data-target="25">0+</div>
+          <div class="trust-stat-label">Years of Service</div>
+        </div>
+        <div class="trust-stat reveal">
+          <div class="trust-stat-number" data-target="1000">0+</div>
+          <div class="trust-stat-label">Businesses Supported</div>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <a href="membership.html" class="btn btn-primary reveal">Become a member</a>
+        <a href="news.html" class="btn btn-ghost-light reveal">Latest news</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="quick-links">
+    <div class="container">
+      <div class="section-heading reveal">
+        <h2 class="reveal">Explore the portal</h2>
+        <p class="reveal">Everything you need — from news and events to member services.</p>
+      </div>
+      <div class="cards">
+        <a href="news.html" class="card reveal">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+              <path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6z"/>
+            </svg>
+          </div>
+          <h3>News &amp; Updates</h3>
+          <p>Trade news, policy updates, and announcements from the Chamber.</p>
+          <span class="card-link">Read news →</span>
+        </a>
+        <a href="directory.html" class="card reveal">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            </svg>
+          </div>
+          <h3>Member Directory</h3>
+          <p>Browse registered businesses and connect with fellow members.</p>
+          <span class="card-link">View directory →</span>
+        </a>
+        <a href="events.html" class="card reveal">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <path d="M16 2v4M8 2v4M3 10h18"/>
+            </svg>
+          </div>
+          <h3>Events</h3>
+          <p>Upcoming meets, trade fairs, seminars and Chamber programs.</p>
+          <span class="card-link">See events →</span>
+        </a>
+        <a href="membership.html" class="card reveal">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h3>Membership</h3>
+          <p>Join the Chamber and access benefits, networking and services.</p>
+          <span class="card-link">Join today →</span>
+        </a>
+        <a href="gallery.html" class="card reveal">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="9" cy="9" r="2"/>
+              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+            </svg>
+          </div>
+          <h3>Gallery</h3>
+          <p>Photos from Chamber events, programs and gatherings.</p>
+          <span class="card-link">View gallery →</span>
+        </a>
+        <a href="committee.html" class="card reveal">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M3 21v-2a6 6 0 0 1 12 0v2"/>
+              <circle cx="17" cy="9" r="3"/>
+              <path d="M21 21v-2a4 4 0 0 0-3-3.87"/>
+            </svg>
+          </div>
+          <h3>Committee</h3>
+          <p>Meet the members leading the Chamber of Commerce Bhuj.</p>
+          <span class="card-link">Meet the committee →</span>
+        </a>
+        <a href="projects.html" class="card reveal">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+              <rect x="8" y="2" width="8" height="4" rx="1"/>
+              <path d="m9 14 2 2 4-4"/>
+            </svg>
+          </div>
+          <h3>Projects</h3>
+          <p>Track the Chamber's ongoing and upcoming initiatives.</p>
+          <span class="card-link">View projects →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="footer-brand">Chamber of Commerce Bhuj</p>
+    <p>© Chamber of Commerce Bhuj. All rights reserved.</p>
+    <p class="contact">contact@cocbhuj.org · +91 2832 XXX XXX</p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var toggle = document.getElementById("navToggle");
+    var menu = document.getElementById("navMenu");
+    toggle.addEventListener("click", function () {
+      var open = menu.classList.toggle("open");
+      toggle.classList.toggle("open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    // Close mobile menu when a link is tapped
+    menu.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", function () {
+        menu.classList.remove("open");
+        toggle.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      });
+    });
+  })();
+
+  /* ---------- Site logo + hero carousel (from site_media) ---------- */
+  (function () {
+    if (typeof supabase === "undefined") return;
+    var SUPABASE_URL = "https://rvpiliwyqjowegmjcanr.supabase.co";
+    var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2cGlsaXd5cWpvd2VnbWpjYW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMDM2MjksImV4cCI6MjEwMjg3OTYyOX0.9ZQj69FLcFgqp8huYTqlWy4JGl-vYGmYZiiVUBo4Sio";
+    var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Site logo fetch
+    var logoImg = document.getElementById("siteLogo");
+    if (logoImg) {
+      supabaseClient
+        .from("site_media")
+        .select("image_url")
+        .eq("type", "logo")
+        .eq("active", true)
+        .order("sort_order", { ascending: true })
+        .limit(1)
+        .then(function (result) {
+          if (result.error) {
+            console.error("Couldn't load site logo:", result.error.message);
+            return;
+          }
+          var rows = result.data || [];
+          if (rows.length > 0 && rows[0].image_url) {
+            logoImg.onload = function () { logoImg.classList.add("loaded"); };
+            logoImg.onerror = function () { console.warn("Site logo failed to load"); };
+            logoImg.src = rows[0].image_url;
+          }
+        })
+        .catch(function (err) { console.error("Logo fetch error:", err); });
+    }
+    
+    // Hero carousel fetch
+    var heroSection = document.getElementById("hero");
+    var heroSlides = document.getElementById("heroSlides");
+    var heroDots = document.getElementById("heroDots");
+    
+    if (!heroSection || !heroSlides || !heroDots) return;
+    
+    var slides = [];
+    var dots = [];
+    var currentIndex = 0;
+    var autoAdvanceTimer = null;
+    
+    function showSlide(index) {
+      if (slides.length === 0) return;
+      
+      // Update slides
+      slides.forEach(function (slide, i) {
+        if (i === index) {
+          slide.classList.add("active");
+        } else {
+          slide.classList.remove("active");
+        }
+      });
+      
+      // Update dots
+      dots.forEach(function (dot, i) {
+        if (i === index) {
+          dot.classList.add("active");
+        } else {
+          dot.classList.remove("active");
+        }
+      });
+      
+      currentIndex = index;
+    }
+    
+    function nextSlide() {
+      var nextIndex = (currentIndex + 1) % slides.length;
+      showSlide(nextIndex);
+    }
+    
+    function prevSlide() {
+      var prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+      showSlide(prevIndex);
+    }
+    
+    function startAutoAdvance() {
+      if (autoAdvanceTimer) clearInterval(autoAdvanceTimer);
+      if (slides.length > 1) {
+        autoAdvanceTimer = setInterval(nextSlide, 4500);
+      }
+    }
+    
+    function resetAutoAdvance() {
+      startAutoAdvance();
+    }
+    
+    // Touch swipe handling
+    var touchStartX = 0;
+    var touchEndX = 0;
+    
+    heroSection.addEventListener("touchstart", function (e) {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    
+    heroSection.addEventListener("touchend", function (e) {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+    
+    function handleSwipe() {
+      var swipeThreshold = 50;
+      var diff = touchStartX - touchEndX;
+      
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          // Swipe left - next slide
+          nextSlide();
+        } else {
+          // Swipe right - previous slide
+          prevSlide();
+        }
+        resetAutoAdvance();
+      }
+    }
+    
+    // Fetch hero photos
+    supabaseClient
+      .from("site_media")
+      .select("*")
+      .eq("type", "hero")
+      .eq("active", true)
+      .order("sort_order", { ascending: true })
+      .then(function (result) {
+        if (result.error) {
+          console.error("Couldn't load hero photos:", result.error.message);
+          return;
+        }
+        
+        var photos = result.data || [];
+        
+        if (photos.length === 0) {
+          // No photos - keep fallback gradient
+          return;
+        }
+        
+        // Remove fallback class
+        heroSection.classList.remove("hero--no-photos");
+        
+        // Create slides
+        photos.forEach(function (photo, index) {
+          var slide = document.createElement("div");
+          slide.className = "hero-slide";
+          slide.style.backgroundImage = "url('" + photo.image_url + "')";
+          
+          if (index === 0) {
+            slide.classList.add("active");
+          }
+          
+          heroSlides.appendChild(slide);
+          slides.push(slide);
+        });
+        
+        // Create dots
+        photos.forEach(function (photo, index) {
+          var dot = document.createElement("button");
+          dot.className = "hero-dot";
+          dot.setAttribute("aria-label", "Go to slide " + (index + 1));
+          
+          if (index === 0) {
+            dot.classList.add("active");
+          }
+          
+          dot.addEventListener("click", function () {
+            showSlide(index);
+            resetAutoAdvance();
+          });
+          
+          heroDots.appendChild(dot);
+          dots.push(dot);
+        });
+        
+        // Start auto-advance
+        startAutoAdvance();
+      })
+      .catch(function (err) {
+        console.error("Hero photos fetch error:", err);
+        // Keep fallback gradient on error
+      });
+  })();
+
+  /* ---------- Scroll reveal animations ---------- */
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-visible');
+        } else {
+          entry.target.classList.remove('reveal-visible');
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      observer.observe(el);
+    });
+    window.__observeReveal = function (el) {
+      if (el) observer.observe(el);
+    };
+  })();
+
+  /* ---------- Trust stats count-up animation ---------- */
+  (function () {
+    var statEls = document.querySelectorAll('.trust-stat-number[data-target]');
+    if (statEls.length === 0) return;
+
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function animateCount(el) {
+      var target = parseInt(el.getAttribute('data-target'), 10) || 0;
+      if (reduceMotion) {
+        el.textContent = target + '+';
+        return;
+      }
+      var duration = 1500;
+      var startTime = null;
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var progress = Math.min((timestamp - startTime) / duration, 1);
+        var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+        var current = Math.floor(eased * target);
+        el.textContent = current + '+';
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = target + '+';
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    var statsObserver = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          animateCount(entry.target);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.4 });
+
+    statEls.forEach(function (el) {
+      statsObserver.observe(el);
+    });
+  })();
+</script>
+
+</body>
+</html>
