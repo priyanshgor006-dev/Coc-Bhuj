@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Membership &mdash; Chamber of Commerce Bhuj</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>
 <style>
 
 :root {
@@ -117,38 +118,14 @@ button { font: inherit; cursor: pointer; }
 .btn-primary:hover::after { transform: translateX(120%); }
 .btn-outline { background: transparent; color: var(--navy); border-color: #d8bec3; }
 .btn-outline:hover { background: var(--wine-tint); border-color: var(--navy-light); transform: translateY(-2px); }
-.btn-outline-light { background: transparent; color: #fff; border-color: rgba(255,255,255,.4); }
-.btn-outline-light:hover { background: rgba(255,255,255,.12); border-color: #fff; transform: translateY(-2px); }
 .btn-small { min-height: 38px; padding: 9px 16px; font-size: 12px; }
 .btn:disabled { opacity: .6; cursor: not-allowed; transform: none !important; }
 
-/* ===== Cards ===== */
-.card {
-  background: #fff; border: 1px solid var(--border); border-radius: 13px;
-  transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
-}
-.card:hover {
-  transform: translateY(-4px); box-shadow: 0 12px 32px rgba(107,31,42,.12), 0 2px 8px rgba(0,0,0,.04);
-  border-color: var(--navy-light);
-}
-.photo-wrap { position: relative; overflow: hidden; background: #efe8e9; }
-.photo-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
-.card:hover .photo-wrap img, a:hover .photo-wrap img, button:hover .photo-wrap img { transform: scale(1.05); }
-.image-fallback {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  color: #b99ba2; background: var(--wine-tint);
-}
-
 /* ===== Reveal animation ===== */
-.reveal {
-  opacity: 0; transform: translateX(-40px);
-  transition: opacity .7s var(--ease), transform .7s var(--ease);
-}
+.reveal { opacity: 0; transform: translateX(-40px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
 .reveal.reveal-right { transform: translateX(40px); }
 .reveal.reveal-visible { opacity: 1; transform: translateX(0); }
-@media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
-}
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
 
 /* ===== Page header ===== */
 .page-hero {
@@ -158,40 +135,65 @@ button { font: inherit; cursor: pointer; }
   border-bottom: 1px solid var(--border);
 }
 .page-hero h1 { font-size: clamp(1.8rem, 3.5vw, 2.4rem); font-weight: 700; margin: 0 0 10px; letter-spacing: -.02em; }
-.page-hero p { color: var(--muted); margin: 0; max-width: 600px; font-size: 15px; }
+.page-hero p { color: var(--muted); margin: 0; max-width: 620px; font-size: 15px; }
+.breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 10px; color: #8f7e81; letter-spacing: .02em; }
+.breadcrumb a { transition: color .15s var(--ease); }
+.breadcrumb a:hover { color: var(--navy); }
+.breadcrumb svg { width: 11px; height: 11px; }
 
 /* ===== Section basics ===== */
-.section { padding: 72px 0; }
+.section { padding: 60px 0; }
 .section-soft { background: var(--bg-soft); }
-.section-heading { text-align: center; margin-bottom: 38px; }
-.section-heading h2 { font-size: clamp(1.5rem, 2.6vw, 1.8rem); font-weight: 700; margin: 0 0 10px; }
-.section-heading p { color: var(--muted); margin: 0; max-width: 560px; margin-inline: auto; font-size: .98rem; }
+.section-heading { margin-bottom: 26px; }
+.section-heading h2 { font-size: clamp(1.4rem, 2.4vw, 1.7rem); font-weight: 700; margin: 0 0 8px; }
+.section-heading p { color: var(--muted); margin: 0; max-width: 640px; font-size: .95rem; }
 
 /* ===== Icons ===== */
 .icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; vertical-align: middle; }
-
-/* ===== States (loading / empty / error) ===== */
-.state-block { text-align: center; padding: 64px 20px; grid-column: 1 / -1; }
 .state-icon {
-  display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px;
+  display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px;
   color: var(--navy-light); background: var(--wine-tint); border-radius: 50%; margin-bottom: 20px;
 }
-.state-icon .icon { width: 28px; height: 28px; }
-.state-block h3 { font-size: 1.2rem; font-weight: 650; color: var(--navy); margin: 0 0 8px; }
-.state-block p { color: var(--muted); font-size: .92rem; max-width: 420px; margin: 0 auto; }
-.state-block .btn { margin-top: 20px; }
-.spinner {
-  width: 30px; height: 30px; border: 3px solid var(--border); border-top-color: var(--navy);
-  border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 14px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+.state-icon .icon { width: 26px; height: 26px; }
 
-/* ===== Forms ===== */
-.admin-form { max-width: 640px; background: #fff; border: 1px solid var(--border); border-radius: 13px; padding: 26px; margin-bottom: 32px; }
-.admin-form h2 { margin: 0 0 18px; font-size: 1.15rem; color: var(--navy); font-weight: 700; }
-.form-row { margin-bottom: 15px; }
+/* ===== Membership category table ===== */
+.category-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 13px; background: #fff; }
+.category-table { width: 100%; border-collapse: collapse; font-size: .84rem; min-width: 720px; }
+.category-table th, .category-table td { padding: 11px 15px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.category-table th {
+  background: var(--wine-tint); color: var(--navy); font-weight: 700; font-size: .72rem;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.category-table tr:last-child td { border-bottom: none; }
+.category-table tbody tr:hover td { background: var(--bg-soft); }
+.foundation-note {
+  margin-top: 18px; padding: 16px 20px; background: var(--wine-tint); border-radius: 10px;
+  border-left: 3px solid var(--gold);
+}
+.foundation-note strong { color: var(--navy); display: block; margin-bottom: 6px; font-size: .9rem; }
+.foundation-note ul { margin: 0; padding-left: 18px; font-size: .84rem; color: var(--text); line-height: 1.8; }
+
+/* ===== Application form ===== */
+.form-shell { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+.form-panel { border: 1px solid var(--border); border-radius: 14px; padding: 32px; background: #fff; }
+.form-panel h2 { font-size: 1.3rem; font-weight: 700; margin: 0 0 6px; }
+.form-intro { color: var(--muted); font-size: .85rem; margin-bottom: 10px; }
+.form-status { padding: 10px 13px; border-radius: 8px; font-size: .88rem; margin-bottom: 16px; border: 1px solid transparent; display: none; }
+.form-status.visible { display: block; }
+.form-status.success { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.form-status.error { background: #fef2f2; color: #a63842; border-color: #fecaca; }
+
+.form-section-title {
+  font-size: .98rem; font-weight: 700; color: var(--navy); margin: 30px 0 16px;
+  padding-top: 22px; border-top: 1px solid var(--border);
+}
+.form-section-title:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+.field-wide { grid-column: 1 / -1; }
 .form-row label { display: block; font-size: .85rem; font-weight: 650; margin-bottom: 6px; color: var(--text); }
 .form-row .req { color: #a63842; margin-left: 2px; }
+.form-row .optional-tag { color: var(--muted); font-weight: 400; font-size: .78rem; }
 .form-row input, .form-row select, .form-row textarea {
   width: 100%; padding: 10px 13px; font-size: .93rem; font-family: inherit;
   background: #fff; border: 1px solid var(--border); border-radius: 8px; outline: none; color: var(--text);
@@ -200,30 +202,57 @@ button { font: inherit; cursor: pointer; }
 .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
   border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(107,31,42,.08);
 }
-.form-row textarea { min-height: 90px; resize: vertical; }
-.form-status { padding: 10px 13px; border-radius: 8px; font-size: .88rem; margin-bottom: 12px; border: 1px solid transparent; display: none; }
-.form-status.visible { display: block; }
-.form-status.success { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
-.form-status.error { background: #fef2f2; color: #a63842; border-color: #fecaca; }
+.form-row textarea { min-height: 80px; resize: vertical; }
+
+.fee-preview {
+  margin-top: 12px; padding: 14px 16px; background: var(--wine-tint); border-radius: 10px;
+  font-size: .86rem; color: var(--navy-dark); display: none; border-left: 3px solid var(--navy-light);
+}
+.fee-preview.visible { display: block; }
+.fee-preview strong { color: var(--navy); }
+.fee-preview .fee-row { display: flex; justify-content: space-between; margin-top: 4px; }
+
+/* ===== Document uploads ===== */
+.upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 640px) { .upload-grid { grid-template-columns: 1fr; } }
+.upload-slot { border: 1px dashed var(--border); border-radius: 11px; padding: 14px 16px; transition: all .2s var(--ease); }
+.upload-slot.uploaded { border-style: solid; border-color: #a7d7b8; background: #f3faf5; }
+.upload-slot-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.upload-slot-label { font-size: .85rem; font-weight: 650; }
+.upload-slot-status { font-size: .76rem; color: var(--muted); margin-top: 4px; }
+.upload-slot.uploaded .upload-slot-status { color: #047857; font-weight: 600; }
+.upload-btn-small {
+  padding: 7px 14px; font-size: .76rem; border-radius: 7px; background: #fff;
+  border: 1px solid var(--border); color: var(--navy); font-weight: 650; flex-shrink: 0;
+}
+.upload-btn-small:hover { background: var(--wine-tint); border-color: var(--navy-light); }
+.upload-remove-small {
+  padding: 7px 10px; font-size: .76rem; border-radius: 7px; background: transparent;
+  border: 1px solid transparent; color: #a63842; font-weight: 650; margin-left: 6px; flex-shrink: 0;
+}
+.upload-remove-small:hover { background: #fef2f2; }
+.upload-hint { font-size: .78rem; color: var(--muted); margin-bottom: 16px; }
+
+/* ===== Bank details ===== */
+.bank-details-card { background: var(--wine-tint); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 18px; }
+.bank-details-card dl { display: grid; grid-template-columns: auto 1fr; gap: 7px 18px; margin: 0; font-size: .88rem; }
+.bank-details-card dt { font-weight: 650; color: var(--navy-dark); }
+.bank-details-card dd { margin: 0; color: var(--text); }
+.bank-note { font-size: .84rem; color: var(--navy-dark); background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+
+.declaration-row {
+  display: flex; gap: 10px; align-items: flex-start; margin: 24px 0 6px;
+  font-size: .85rem; color: var(--text); line-height: 1.6;
+}
+.declaration-row input { margin-top: 3px; flex-shrink: 0; width: 16px; height: 16px; accent-color: var(--navy); }
+
+.confirmation { text-align: center; padding: 30px 0; }
 
 /* ===== Footer ===== */
 .site-footer { background: var(--navy-dark); color: rgba(255,255,255,.85); padding: 34px 20px; text-align: center; font-size: .88rem; }
 .site-footer p { margin: 0; }
 .site-footer .footer-brand { font-weight: 650; color: #fff; margin-bottom: 4px; }
 .site-footer .contact { opacity: .7; margin-top: 10px; font-size: .82rem; }
-
-
-  .coming-soon { text-align: center; padding: 80px 20px 96px; max-width: 640px; margin: 0 auto; }
-  .coming-soon .state-icon { width: 84px; height: 84px; margin-bottom: 24px; }
-  .coming-soon .state-icon .icon { width: 36px; height: 36px; }
-  .coming-soon h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; margin: 0 0 16px; }
-  .coming-soon p { color: var(--muted); font-size: 1rem; line-height: 1.75; margin: 0 auto 26px; max-width: 480px; }
-
-
-.breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 10px; color: #8f7e81; letter-spacing: .02em; }
-.breadcrumb a { transition: color .15s var(--ease); }
-.breadcrumb a:hover { color: var(--navy); }
-.breadcrumb svg { width: 11px; height: 11px; }
 </style>
 </head>
 <body>
@@ -258,20 +287,248 @@ button { font: inherit; cursor: pointer; }
 <main>
   <section class="page-hero">
     <div class="container reveal">
-      <span class="eyebrow">Your business belongs in the conversation</span>
+      <span class="eyebrow">Join the Chamber</span>
       <div class="breadcrumb reveal"><a href="index.html">Home</a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg><span>Membership</span></div>
-    <h1 class="gradient-text">Membership</h1>
-      <p>Join the Chamber and access benefits, networking opportunities, and member services.</p>
+      <h1 class="gradient-text">Membership</h1>
+      <p>Join the Bhuj Chamber of Commerce &amp; Industries and become part of a growing business community.</p>
     </div>
   </section>
-  <div class="coming-soon reveal">
-    <div class="state-icon">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+
+  <!-- ===== Membership Categories ===== -->
+  <section class="section section-soft">
+    <div class="container">
+      <div class="section-heading reveal">
+        <span class="eyebrow">Choose what fits your business</span>
+        <h2>Membership Categories &amp; Fees</h2>
+        <p>Review the fee structure below before applying. Your selected category in the form will automatically show the matching fees.</p>
+      </div>
+      <div class="category-table-wrap reveal">
+        <table class="category-table" id="categoryTable">
+          <thead>
+            <tr><th>Category</th><th>Eligibility</th><th>Admission Fee (&#8377;)</th><th>Annual Fee (&#8377;)</th><th>GST</th></tr>
+          </thead>
+          <tbody>
+            <tr data-cat="Startup / Small Trader Member" data-admission="2500" data-annual="2000"><td>Startup / Small Trader Member</td><td>Small traders, startups</td><td>2,500</td><td>2,000</td><td>Applicable</td></tr>
+            <tr data-cat="General Business Member" data-admission="4500" data-annual="2250"><td>General Business Member</td><td>Partnership / LLP / MSME</td><td>4,500</td><td>2,250</td><td>Applicable</td></tr>
+            <tr data-cat="Corporate Member – Small" data-admission="0" data-annual="6500"><td>Corporate Member &ndash; Small</td><td>Turnover upto &#8377;5 Crores</td><td>Waived</td><td>6,500</td><td>Applicable</td></tr>
+            <tr data-cat="Corporate Member – Medium" data-admission="0" data-annual="17500"><td>Corporate Member &ndash; Medium</td><td>&#8377;6&ndash;35 Crores</td><td>Waived</td><td>17,500</td><td>Applicable</td></tr>
+            <tr data-cat="Corporate Member – Large" data-admission="0" data-annual="30000"><td>Corporate Member &ndash; Large</td><td>&#8377;36&ndash;100 Crores</td><td>Waived</td><td>30,000</td><td>Applicable</td></tr>
+            <tr data-cat="Corporate Member – Premium" data-admission="17500" data-annual="65000"><td>Corporate Member &ndash; Premium</td><td>&#8377;101&ndash;250 Crores</td><td>17,500</td><td>65,000</td><td>Applicable</td></tr>
+            <tr data-cat="Corporate Member – Elite" data-admission="65000" data-annual="130000"><td>Corporate Member &ndash; Elite</td><td>&#8377;251&ndash;500 Crores</td><td>65,000</td><td>1,30,000</td><td>Applicable</td></tr>
+            <tr data-cat="Mega Industry Member" data-admission="110000" data-annual="185000"><td>Mega Industry Member</td><td>Above &#8377;500 Crores</td><td>1,10,000</td><td>1,85,000</td><td>Applicable</td></tr>
+            <tr data-cat="Association Member" data-admission="0" data-annual="9500"><td>Association Member</td><td>Trade Associations</td><td>Waived</td><td>9,500</td><td>Applicable</td></tr>
+            <tr data-cat="Institutional Member" data-admission="0" data-annual="6500"><td>Institutional Member</td><td>Institutions / NGOs</td><td>Waived</td><td>6,500</td><td>Applicable</td></tr>
+            <tr data-cat="Patron Member – Individual" data-admission="20000" data-annual="0"><td>Patron Member &ndash; Individual</td><td>Business Personalities</td><td>20,000</td><td>NIL</td><td>Applicable</td></tr>
+            <tr data-cat="Lifetime Member – Firm/Company" data-admission="60000" data-annual="0"><td>Lifetime Member &ndash; Firm/Company</td><td>Firms / Companies</td><td>60,000</td><td>NIL</td><td>Inclusive</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="foundation-note reveal">
+        <strong>Special Foundation Membership Scheme</strong>
+        <ul>
+          <li>Founding Member Certificate</li>
+          <li>Priority Networking Access</li>
+          <li>Admission Fee Waiver for MSMEs during initial period</li>
+          <li>Special Startup &amp; Youth Entrepreneur Promotion</li>
+        </ul>
+      </div>
     </div>
-    <h2 class="gradient-text">Your next chapter starts with connection.</h2>
-    <p>A complete online membership application and payment system is planned for a future phase. While we prepare it, get to know the businesses that make up our community.</p>
-    <a class="btn btn-primary" href="directory.html">Meet our members</a>
-  </div>
+  </section>
+
+  <!-- ===== Application Form ===== -->
+  <section class="section">
+    <div class="form-shell">
+      <div class="form-panel reveal">
+        <h2>Membership Application Form</h2>
+        <p class="form-intro">Fields marked with an asterisk are required. Please have your documents ready before starting.</p>
+        <div class="form-status" id="formStatus" role="status"></div>
+
+        <form id="membershipForm" novalidate>
+
+          <div class="form-section-title">Organization Details</div>
+          <div class="form-grid">
+            <div class="form-row field-wide">
+              <label for="orgName">Name of Organization / Firm <span class="req">*</span></label>
+              <input id="orgName" type="text" required />
+            </div>
+            <div class="form-row">
+              <label for="orgType">Type of Organization <span class="req">*</span></label>
+              <select id="orgType" required>
+                <option value="">Select type</option>
+                <option>Proprietorship</option>
+                <option>Partnership</option>
+                <option>LLP</option>
+                <option>Private Limited Company</option>
+                <option>Public Limited Company</option>
+                <option>Trust / Society</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="orgEstYear">Year of Establishment</label>
+              <input id="orgEstYear" type="text" placeholder="e.g. 2015" />
+            </div>
+            <div class="form-row field-wide">
+              <label for="natureBusiness">Nature of Business <span class="req">*</span></label>
+              <input id="natureBusiness" type="text" required />
+            </div>
+            <div class="form-row field-wide">
+              <label for="businessDetails">Main Business / Activity Details</label>
+              <textarea id="businessDetails" rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section-title">Registration &amp; Legal</div>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="cinNo">CIN / Registration No.</label>
+              <input id="cinNo" type="text" />
+            </div>
+            <div class="form-row">
+              <label for="gstNo">GST No.</label>
+              <input id="gstNo" type="text" />
+            </div>
+            <div class="form-row field-wide">
+              <label for="panNo">PAN / TAN / Other Registration No.</label>
+              <input id="panNo" type="text" />
+            </div>
+          </div>
+
+          <div class="form-section-title">Address &amp; Contact</div>
+          <div class="form-grid">
+            <div class="form-row field-wide">
+              <label for="regAddress">Registered / Head Office Address <span class="req">*</span></label>
+              <textarea id="regAddress" rows="2" required></textarea>
+            </div>
+            <div class="form-row field-wide">
+              <label for="branchAddress">Factory / Branch Office Address <span class="optional-tag">(optional)</span></label>
+              <textarea id="branchAddress" rows="2"></textarea>
+            </div>
+            <div class="form-row">
+              <label for="orgPhone">Phone</label>
+              <input id="orgPhone" type="tel" />
+            </div>
+            <div class="form-row">
+              <label for="orgMobile">Mobile <span class="req">*</span></label>
+              <input id="orgMobile" type="tel" required />
+            </div>
+            <div class="form-row">
+              <label for="orgEmail">E-mail <span class="req">*</span></label>
+              <input id="orgEmail" type="email" required />
+            </div>
+            <div class="form-row">
+              <label for="orgWebsite">Website <span class="optional-tag">(optional)</span></label>
+              <input id="orgWebsite" type="text" placeholder="www.example.com" />
+            </div>
+          </div>
+
+          <div class="form-section-title">Authorized Representative &ndash; 1</div>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="rep1Name">Name</label>
+              <input id="rep1Name" type="text" />
+            </div>
+            <div class="form-row">
+              <label for="rep1Designation">Designation</label>
+              <input id="rep1Designation" type="text" />
+            </div>
+            <div class="form-row">
+              <label for="rep1Mobile">Mobile</label>
+              <input id="rep1Mobile" type="tel" />
+            </div>
+            <div class="form-row">
+              <label for="rep1Email">E-mail</label>
+              <input id="rep1Email" type="email" />
+            </div>
+          </div>
+
+          <div class="form-section-title">Authorized Representative &ndash; 2 <span class="optional-tag">(optional)</span></div>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="rep2Name">Name</label>
+              <input id="rep2Name" type="text" />
+            </div>
+            <div class="form-row">
+              <label for="rep2Designation">Designation</label>
+              <input id="rep2Designation" type="text" />
+            </div>
+            <div class="form-row">
+              <label for="rep2Mobile">Mobile</label>
+              <input id="rep2Mobile" type="tel" />
+            </div>
+            <div class="form-row">
+              <label for="rep2Email">E-mail</label>
+              <input id="rep2Email" type="email" />
+            </div>
+          </div>
+
+          <div class="form-section-title">Business Scale</div>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="numEmployees">Number of Employees</label>
+              <input id="numEmployees" type="text" />
+            </div>
+            <div class="form-row">
+              <label for="annualTurnover">Annual Turnover</label>
+              <input id="annualTurnover" type="text" placeholder="e.g. &#8377;2 Crores" />
+            </div>
+          </div>
+
+          <div class="form-section-title">Membership Category</div>
+          <div class="form-grid">
+            <div class="form-row field-wide">
+              <label for="membershipCategory">Select Membership Category <span class="req">*</span></label>
+              <select id="membershipCategory" required>
+                <option value="">Select a category</option>
+              </select>
+              <div class="fee-preview" id="feePreview">
+                <div class="fee-row"><span>Admission Fee</span><strong id="feeAdmission">&#8377;0</strong></div>
+                <div class="fee-row"><span>Annual Fee</span><strong id="feeAnnual">&#8377;0</strong></div>
+                <div class="fee-row"><span>GST</span><strong id="feeGst">&mdash;</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section-title">Required Documents</div>
+          <p class="upload-hint">PDF, PNG, or JPG accepted. Upload clear, legible copies.</p>
+          <div class="upload-grid" id="uploadGrid">
+            <!-- upload slots injected by JS -->
+          </div>
+
+          <div class="form-section-title">Payment</div>
+          <div class="bank-details-card">
+            <dl>
+              <dt>Bank Name</dt><dd>Bandhan Bank</dd>
+              <dt>Account Name</dt><dd>M/S BHUJ CHAMBER OF COMMERCE &amp; INDUSTRIES FEDERATION</dd>
+              <dt>Account Number</dt><dd>20200151193650</dd>
+              <dt>Branch</dt><dd>Bhuj</dd>
+              <dt>IFSC Code</dt><dd>BDBL0001761</dd>
+              <dt>Branch Code</dt><dd>1761</dd>
+              <dt>Branch Address</dt><dd>MB Bhagat Complex, Lal Tekry, Bhuj-Kutch, Gujarat &ndash; 370001</dd>
+            </dl>
+          </div>
+          <p class="bank-note">Please mention your organization name and membership reference while making the payment, and upload your transaction receipt below.</p>
+          <div class="upload-grid" id="uploadGridPayment" style="margin-top:14px">
+            <!-- payment receipt upload slot injected by JS -->
+          </div>
+
+          <label class="declaration-row">
+            <input type="checkbox" id="declarationCheck" required />
+            <span>I / We hereby declare that the above information is true and correct and that I / We shall abide by the rules, decisions and regulations of the Bhuj Chamber of Commerce &amp; Industries.</span>
+          </label>
+
+          <button type="submit" class="btn btn-primary" style="margin-top:8px" id="submitBtn">Submit Application</button>
+        </form>
+
+        <div class="confirmation" id="confirmation" style="display:none">
+          <div class="state-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 12 4 4L19 6"/></svg></div>
+          <h2 class="gradient-text">Application received.</h2>
+          <p style="color:var(--muted);margin:12px 0 24px">Thank you for applying. The Chamber will review your application and documents, and get in touch regarding your membership.</p>
+          <button type="button" class="btn btn-outline" id="resetForm">Submit another application</button>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer class="site-footer">
@@ -305,7 +562,299 @@ button { font: inherit; cursor: pointer; }
     updateShadow();
   })();
 
+/* ---------- Membership category dropdown + fee preview ---------- */
+  (function () {
+    var table = document.getElementById("categoryTable");
+    var select = document.getElementById("membershipCategory");
+    var preview = document.getElementById("feePreview");
+    var feeAdmission = document.getElementById("feeAdmission");
+    var feeAnnual = document.getElementById("feeAnnual");
+    var feeGst = document.getElementById("feeGst");
 
+    var rows = table.querySelectorAll("tbody tr");
+    rows.forEach(function (row) {
+      var opt = document.createElement("option");
+      opt.value = row.dataset.cat;
+      opt.textContent = row.dataset.cat;
+      select.appendChild(opt);
+    });
+
+    function formatFee(amount) {
+      var n = Number(amount);
+      if (!n) return "NIL / Waived";
+      return "\u20b9" + n.toLocaleString("en-IN");
+    }
+
+    select.addEventListener("change", function () {
+      var match = null;
+      rows.forEach(function (row) { if (row.dataset.cat === select.value) match = row; });
+      if (!match) { preview.classList.remove("visible"); return; }
+      feeAdmission.textContent = formatFee(match.dataset.admission);
+      feeAnnual.textContent = formatFee(match.dataset.annual);
+      feeGst.textContent = match.children[4].textContent;
+      preview.classList.add("visible");
+    });
+  })();
+
+/* ---------- Document uploads (shared Cloudinary widget) ---------- */
+  (function () {
+    var CLOUDINARY_CLOUD_NAME = "c3josacx";
+    var CLOUDINARY_UPLOAD_PRESET = "coc_bhuj_news";
+    var CLOUDINARY_FOLDER = "coc-bhuj-news/membership-applications";
+
+    var docFields = [
+      { key: "doc_certificate", label: "Certificate", required: true },
+      { key: "doc_pan", label: "PAN Card", required: true },
+      { key: "doc_registration", label: "Registration Certificate", required: true },
+      { key: "doc_gst", label: "GST / Registration Certificate", required: true },
+      { key: "doc_address_proof", label: "Address Proof", required: true },
+      { key: "doc_partnership_deed", label: "Partnership Deed / MOA / AOA", required: false },
+      { key: "doc_photo", label: "Passport Size Photograph", required: true }
+    ];
+    var paymentField = { key: "doc_payment_receipt", label: "Payment Transaction Receipt", required: false };
+
+    var uploadedDocs = {};
+    var currentUploadKey = null;
+    var uploadWidget = null;
+    var uploadGrid = document.getElementById("uploadGrid");
+    var uploadGridPayment = document.getElementById("uploadGridPayment");
+    var formStatus = document.getElementById("formStatus");
+
+    function showStatus(type, message) {
+      formStatus.className = "form-status visible " + type;
+      formStatus.textContent = message;
+    }
+
+    function buildSlot(field) {
+      var slot = document.createElement("div");
+      slot.className = "upload-slot";
+      slot.id = "slot-" + field.key;
+
+      var top = document.createElement("div");
+      top.className = "upload-slot-top";
+
+      var labelWrap = document.createElement("div");
+      var label = document.createElement("div");
+      label.className = "upload-slot-label";
+      label.textContent = field.label + (field.required ? " *" : " (optional)");
+      var status = document.createElement("div");
+      status.className = "upload-slot-status";
+      status.id = "status-" + field.key;
+      status.textContent = "No file uploaded";
+      labelWrap.appendChild(label);
+      labelWrap.appendChild(status);
+
+      var actions = document.createElement("div");
+      var uploadBtn = document.createElement("button");
+      uploadBtn.type = "button";
+      uploadBtn.className = "upload-btn-small";
+      uploadBtn.textContent = "Upload";
+      uploadBtn.addEventListener("click", function () { openWidgetFor(field.key); });
+      actions.appendChild(uploadBtn);
+
+      var removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "upload-remove-small";
+      removeBtn.textContent = "Remove";
+      removeBtn.style.display = "none";
+      removeBtn.id = "remove-" + field.key;
+      removeBtn.addEventListener("click", function () { clearSlot(field.key); });
+      actions.appendChild(removeBtn);
+
+      top.appendChild(labelWrap);
+      top.appendChild(actions);
+      slot.appendChild(top);
+      return slot;
+    }
+
+    docFields.forEach(function (f) { uploadGrid.appendChild(buildSlot(f)); });
+    uploadGridPayment.appendChild(buildSlot(paymentField));
+
+    function clearSlot(key) {
+      delete uploadedDocs[key];
+      var slot = document.getElementById("slot-" + key);
+      var status = document.getElementById("status-" + key);
+      var removeBtn = document.getElementById("remove-" + key);
+      slot.classList.remove("uploaded");
+      status.textContent = "No file uploaded";
+      removeBtn.style.display = "none";
+    }
+
+    function markUploaded(key, url) {
+      uploadedDocs[key] = url;
+      var slot = document.getElementById("slot-" + key);
+      var status = document.getElementById("status-" + key);
+      var removeBtn = document.getElementById("remove-" + key);
+      slot.classList.add("uploaded");
+      status.textContent = "\u2713 Uploaded";
+      removeBtn.style.display = "inline-block";
+    }
+
+    function initWidget() {
+      if (typeof cloudinary === "undefined" || !cloudinary.createUploadWidget) {
+        showStatus("error", "Upload tool didn't load. Please refresh the page.");
+        return;
+      }
+      uploadWidget = cloudinary.createUploadWidget({
+        cloudName: CLOUDINARY_CLOUD_NAME,
+        uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+        folder: CLOUDINARY_FOLDER,
+        resourceType: "auto",
+        cropping: false,
+        multiple: false,
+        maxFiles: 1,
+        sources: ["local", "camera"],
+        clientAllowedFormats: ["png", "jpg", "jpeg", "webp", "heic", "heif", "pdf"]
+      }, function (error, result) {
+        if (error) {
+          showStatus("error", "Upload failed: " + (error.message || "Unknown error"));
+          return;
+        }
+        if (result && result.event === "success" && result.info && result.info.secure_url && currentUploadKey) {
+          markUploaded(currentUploadKey, result.info.secure_url);
+          formStatus.classList.remove("visible");
+        }
+      });
+    }
+
+    function openWidgetFor(key) {
+      if (!uploadWidget) {
+        showStatus("error", "Upload tool not ready. Please refresh the page.");
+        return;
+      }
+      currentUploadKey = key;
+      uploadWidget.open();
+    }
+
+    initWidget();
+
+    window.__membershipDocFields = docFields;
+    window.__membershipPaymentField = paymentField;
+    window.__getUploadedDocs = function () { return uploadedDocs; };
+  })();
+
+/* ---------- Membership form submission ---------- */
+  (function () {
+    var SUPABASE_URL = "https://rvpiliwyqjowegmjcanr.supabase.co";
+    var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2cGlsaXd5cWpvd2VnbWpjYW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMDM2MjksImV4cCI6MjEwMjg3OTYyOX0.9ZQj69FLcFgqp8huYTqlWy4JGl-vYGmYZiiVUBo4Sio";
+    var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    var form = document.getElementById("membershipForm");
+    var confirmation = document.getElementById("confirmation");
+    var formStatus = document.getElementById("formStatus");
+    var submitBtn = document.getElementById("submitBtn");
+
+    function showStatus(type, message) {
+      formStatus.className = "form-status visible " + type;
+      formStatus.textContent = message;
+    }
+
+    function val(id) { return document.getElementById(id).value.trim(); }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      var orgName = val("orgName");
+      var orgType = val("orgType");
+      var natureBusiness = val("natureBusiness");
+      var regAddress = val("regAddress");
+      var orgMobile = val("orgMobile");
+      var orgEmail = val("orgEmail");
+      var membershipCategory = val("membershipCategory");
+      var declared = document.getElementById("declarationCheck").checked;
+
+      if (!orgName || !orgType || !natureBusiness || !regAddress || !orgMobile || !orgEmail || !membershipCategory) {
+        showStatus("error", "Please fill in all required fields marked with an asterisk.");
+        return;
+      }
+      if (!declared) {
+        showStatus("error", "Please confirm the declaration before submitting.");
+        return;
+      }
+
+      var uploadedDocs = window.__getUploadedDocs();
+      var docFields = window.__membershipDocFields;
+      var missingDocs = docFields.filter(function (f) { return f.required && !uploadedDocs[f.key]; });
+      if (missingDocs.length > 0) {
+        showStatus("error", "Please upload: " + missingDocs.map(function (f) { return f.label; }).join(", "));
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      var row = {
+        organization_name: orgName,
+        organization_type: orgType,
+        nature_of_business: natureBusiness,
+        business_activity_details: val("businessDetails") || null,
+        year_of_establishment: val("orgEstYear") || null,
+        registration_no: val("cinNo") || null,
+        gst_no: val("gstNo") || null,
+        pan_tan_no: val("panNo") || null,
+        registered_address: regAddress,
+        factory_branch_address: val("branchAddress") || null,
+        phone: val("orgPhone") || null,
+        mobile: orgMobile,
+        email: orgEmail,
+        website: val("orgWebsite") || null,
+        rep1_name: val("rep1Name") || null,
+        rep1_designation: val("rep1Designation") || null,
+        rep1_mobile: val("rep1Mobile") || null,
+        rep1_email: val("rep1Email") || null,
+        rep2_name: val("rep2Name") || null,
+        rep2_designation: val("rep2Designation") || null,
+        rep2_mobile: val("rep2Mobile") || null,
+        rep2_email: val("rep2Email") || null,
+        number_of_employees: val("numEmployees") || null,
+        annual_turnover: val("annualTurnover") || null,
+        membership_category: membershipCategory,
+        doc_certificate_url: uploadedDocs.doc_certificate || null,
+        doc_pan_url: uploadedDocs.doc_pan || null,
+        doc_registration_url: uploadedDocs.doc_registration || null,
+        doc_gst_url: uploadedDocs.doc_gst || null,
+        doc_address_proof_url: uploadedDocs.doc_address_proof || null,
+        doc_partnership_deed_url: uploadedDocs.doc_partnership_deed || null,
+        doc_photo_url: uploadedDocs.doc_photo || null,
+        doc_payment_receipt_url: uploadedDocs.doc_payment_receipt || null,
+        status: "Pending"
+      };
+
+      supabaseClient
+        .from("membership_applications")
+        .insert([row])
+        .then(function (result) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit Application";
+          if (result.error) {
+            showStatus("error", "Couldn't submit application: " + (result.error.message || "Unknown error"));
+            return;
+          }
+          formStatus.classList.remove("visible");
+          form.style.display = "none";
+          confirmation.style.display = "block";
+        })
+        .catch(function (err) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit Application";
+          showStatus("error", "Couldn't submit application: " + (err.message || "Unknown error"));
+        });
+    });
+
+    document.getElementById("resetForm").addEventListener("click", function () {
+      form.reset();
+      document.querySelectorAll(".upload-slot").forEach(function (slot) {
+        var key = slot.id.replace("slot-", "");
+        slot.classList.remove("uploaded");
+        document.getElementById("status-" + key).textContent = "No file uploaded";
+        document.getElementById("remove-" + key).style.display = "none";
+      });
+      for (var k in window.__getUploadedDocs()) { delete window.__getUploadedDocs()[k]; }
+      document.getElementById("feePreview").classList.remove("visible");
+      confirmation.style.display = "none";
+      form.style.display = "block";
+    });
+  })();
 
 /* ---------- Scroll reveal animations ---------- */
   (function () {
