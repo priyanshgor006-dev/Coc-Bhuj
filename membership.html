@@ -69,7 +69,6 @@ button { font: inherit; cursor: pointer; }
 }
 .nav-menu a:hover, .nav-menu a.active { color: var(--navy); }
 .nav-menu a:hover::after, .nav-menu a.active::after { width: 100%; }
-.nav-admin { color: var(--navy) !important; font-weight: 650; }
 
 .nav-toggle {
   display: none; background: transparent; border: 1px solid var(--border); border-radius: 6px;
@@ -278,7 +277,6 @@ button { font: inherit; cursor: pointer; }
         <li><a href="certificates.html">Certificates</a></li>
         <li><a href="committee.html">Committee</a></li>
         <li><a href="membership.html" class="active" aria-current="page">Membership</a></li>
-        <li><a href="admin.html" class="nav-admin">Admin</a></li>
       </ul>
     </nav>
   </div>
@@ -867,12 +865,22 @@ button { font: inherit; cursor: pointer; }
         slideCounter++;
       }
     }
-    var observer = new IntersectionObserver(function (entries) {
+    // Reveal once and stop observing. Threshold is 0 (not 0.15) because the
+    // ratio IntersectionObserver reports is visible-area / the TARGET's own
+    // total area -- for a very tall element like .form-panel, even a full
+    // screen of visible content can be a small fraction of its total height,
+    // so a percentage threshold could take most of a scroll-through to fire,
+    // or never fire at all for tall enough content. Zero fires the moment
+    // any part of the element enters the viewport, which is what "reveal on
+    // scroll" actually means regardless of the element's height.
+    var observer = new IntersectionObserver(function (entries, obs) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting) entry.target.classList.add('reveal-visible');
-        else entry.target.classList.remove('reveal-visible');
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-visible');
+          obs.unobserve(entry.target);
+        }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0 });
     document.querySelectorAll('.reveal').forEach(function (el) {
       assignDirection(el); observer.observe(el);
     });
