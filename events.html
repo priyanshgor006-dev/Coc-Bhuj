@@ -68,7 +68,6 @@ button { font: inherit; cursor: pointer; }
 }
 .nav-menu a:hover, .nav-menu a.active { color: var(--navy); }
 .nav-menu a:hover::after, .nav-menu a.active::after { width: 100%; }
-.nav-admin { color: var(--navy) !important; font-weight: 650; }
 
 .nav-toggle {
   display: none; background: transparent; border: 1px solid var(--border); border-radius: 6px;
@@ -249,7 +248,6 @@ button { font: inherit; cursor: pointer; }
         <li><a href="certificates.html">Certificates</a></li>
         <li><a href="committee.html">Committee</a></li>
         <li><a href="membership.html">Membership</a></li>
-        <li><a href="admin.html" class="nav-admin">Admin</a></li>
       </ul>
     </nav>
   </div>
@@ -318,12 +316,19 @@ button { font: inherit; cursor: pointer; }
         slideCounter++;
       }
     }
-    var observer = new IntersectionObserver(function (entries) {
+    // Reveal once and stop observing, with threshold 0 so it fires as soon as
+    // any part of an element enters the viewport -- a percentage threshold
+    // like 0.15 can take a very long scroll (or never fire) for tall elements,
+    // since the ratio IntersectionObserver reports is visible-area divided by
+    // the TARGET's own total area, not the viewport's.
+    var observer = new IntersectionObserver(function (entries, obs) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting) entry.target.classList.add('reveal-visible');
-        else entry.target.classList.remove('reveal-visible');
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-visible');
+          obs.unobserve(entry.target);
+        }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0 });
     document.querySelectorAll('.reveal').forEach(function (el) {
       assignDirection(el); observer.observe(el);
     });
