@@ -415,7 +415,7 @@
       <section class="invitation" aria-labelledby="homeInvitation"><div class="container invitation-inner"><div class="reveal"><div class="eyebrow">Progress begins with us</div><h2 id="homeInvitation">Stronger connections.<br>A stronger Bhuj.</h2><p>Discover a community with a shared ambition to move forward.</p></div><a class="btn btn-primary reveal" href="membership.html">Be part of the community<svg class="icon" aria-hidden="true"><use href="#i-arrow"></use></svg></a></div></section>
     </section>
   </main>
-  <footer class="site-footer" id="siteFooter"><div class="container"><div class="footer-main"><div><a href="index.html" class="footer-brand">Chamber of Commerce<br>Bhuj</a><p class="footer-region">Kutch &#183; Gujarat &#183; India</p><p class="footer-tagline">Rooted in Kutch. Growing together.</p></div><div><h2 class="footer-heading">Let's stay connected</h2><a class="footer-contact" href="mailto:contact@cocbhuj.org">contact@cocbhuj.org</a><span class="footer-contact" title="Telephone number awaiting confirmation">+91 2832 XXX XXX</span><a class="footer-contact" href="directory.html">Discover our business community</a></div><div><h2 class="footer-heading">Your Chamber</h2><div class="footer-links"><a href="about.html">About us</a><a href="committee.html">Our committee</a><a href="membership.html">Membership</a><a href="certificates.html">Certificates</a></div></div></div><div class="footer-bottom"><span>&#169; <span id="copyrightYear">2026</span> Chamber of Commerce Bhuj. All rights reserved.</span><button class="back-top" id="backToTop">Back to top<svg class="icon" aria-hidden="true"><use href="#i-up"></use></svg></button></div></div></footer>
+  <footer class="site-footer" id="siteFooter"><div class="container"><div class="footer-main"><div><a href="index.html" class="footer-brand">Chamber of Commerce<br>Bhuj</a><p class="footer-region">Kutch &#183; Gujarat &#183; India</p><p class="footer-tagline">Rooted in Kutch. Growing together.</p></div><div><h2 class="footer-heading">Let's stay connected</h2><a class="footer-contact" href="mailto:Infoatccifb@gmail.com">Infoatccifb@gmail.com</a><span class="footer-contact" title="Telephone number awaiting confirmation">+91 2832 XXX XXX</span><a class="footer-contact" href="directory.html">Discover our business community</a></div><div><h2 class="footer-heading">Your Chamber</h2><div class="footer-links"><a href="about.html">About us</a><a href="committee.html">Our committee</a><a href="membership.html">Membership</a><a href="certificates.html">Certificates</a></div></div></div><div class="footer-bottom"><span>&#169; <span id="copyrightYear">2026</span> Chamber of Commerce Bhuj. All rights reserved.</span><button class="back-top" id="backToTop">Back to top<svg class="icon" aria-hidden="true"><use href="#i-up"></use></svg></button></div></div></footer>
   <div class="toast" id="toast" role="status"><span id="toastMessage"></span><button id="toastClose" aria-label="Dismiss notification"><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button></div>
   <noscript><div style="padding:20px;text-align:center;background:#fff3db;color:#6b1f2a">Please enable JavaScript to browse the portal and load live Chamber content.</div></noscript>
   <script>
@@ -571,12 +571,14 @@
             slideCounter++;
           }
         }
-        const observer = new IntersectionObserver(function (entries) {
+        const observer = new IntersectionObserver(function (entries, obs) {
           entries.forEach(function (entry) {
-            if (entry.isIntersecting) entry.target.classList.add('reveal-visible');
-            else entry.target.classList.remove('reveal-visible');
+            if (entry.isIntersecting) {
+              entry.target.classList.add('reveal-visible');
+              obs.unobserve(entry.target);
+            }
           });
-        }, { threshold: .15 });
+        }, { threshold: 0 });
         $$('.reveal').forEach(function (element) { assignDirection(element); observer.observe(element); });
         window.__observeReveal = function (element) {
           if (element) { assignDirection(element); observer.observe(element); }
